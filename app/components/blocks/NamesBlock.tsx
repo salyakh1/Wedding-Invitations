@@ -24,6 +24,7 @@ export default function NamesBlock({ block, isSelected, onMouseDown, invitation,
       style={{
         background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
         backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
         border: '1px solid rgba(255,255,255,0.2)',
         boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
         minHeight: '100%'
