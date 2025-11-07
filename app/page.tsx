@@ -20,7 +20,7 @@ export default function LoginPage() {
 
     try {
       await signIn(email, password)
-      router.push('/constructor')
+      router.push('/create')
     } catch (error: any) {
       setError(error.message)
     } finally {
