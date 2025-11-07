@@ -64,8 +64,20 @@ export default function InvitationViewPage() {
         updatedAt: data.updated_at
       }
       
-      console.log('Loaded invitation:', mappedInvitation)
-      console.log('Blocks count:', mappedInvitation.blocks.length)
+      console.log('=== LOADED INVITATION DATA ===')
+      console.log('Raw data from Supabase:', data)
+      console.log('Mapped invitation:', mappedInvitation)
+      console.log('Blocks from database:', data.blocks)
+      console.log('Blocks type:', typeof data.blocks)
+      console.log('Blocks is array:', Array.isArray(data.blocks))
+      console.log('Blocks count:', mappedInvitation.blocks?.length || 0)
+      console.log('Blocks content:', JSON.stringify(mappedInvitation.blocks, null, 2))
+      
+      // Проверяем, что blocks - это массив
+      if (!Array.isArray(mappedInvitation.blocks)) {
+        console.error('ERROR: blocks is not an array!', mappedInvitation.blocks)
+        mappedInvitation.blocks = []
+      }
       
       setInvitation(mappedInvitation)
     } catch (error) {
@@ -379,15 +391,41 @@ export default function InvitationViewPage() {
 
             {/* Render Blocks - Mobile Optimized with Normal Flow */}
             <div className="relative w-full pb-8">
-              {invitation.blocks && invitation.blocks.length > 0 ? (
-                invitation.blocks
-                  .filter(b => b.type !== 'background')
+              {(() => {
+                console.log('=== RENDERING BLOCKS ===')
+                console.log('All blocks:', invitation.blocks)
+                console.log('Blocks count:', invitation.blocks?.length || 0)
+                
+                if (!invitation.blocks || invitation.blocks.length === 0) {
+                  console.log('No blocks to render')
+                  return (
+                    <div className="text-center py-8 px-4">
+                      <p className="text-gray-500 text-lg">Приглашение пока пустое. Блоки будут добавлены позже.</p>
+                    </div>
+                  )
+                }
+                
+                const nonBackgroundBlocks = invitation.blocks.filter(b => b.type !== 'background')
+                console.log('Non-background blocks:', nonBackgroundBlocks)
+                console.log('Non-background blocks count:', nonBackgroundBlocks.length)
+                
+                if (nonBackgroundBlocks.length === 0) {
+                  console.log('No non-background blocks to render')
+                  return (
+                    <div className="text-center py-8 px-4">
+                      <p className="text-gray-500 text-lg">Приглашение пока пустое. Добавьте блоки в конструкторе.</p>
+                    </div>
+                  )
+                }
+                
+                return nonBackgroundBlocks
                   .sort((a, b) => {
                     const aY = a.position?.y || 0
                     const bY = b.position?.y || 0
                     return aY - bY
                   })
                   .map((block, index) => {
+                    console.log(`Rendering block ${index}:`, block.type, block)
                   
                   // Используем размеры из блока (на мобильных адаптируем)
                   const isStoryBlock = block.type === 'story'
@@ -410,12 +448,8 @@ export default function InvitationViewPage() {
                       {renderBlock(block)}
                     </div>
                   )
-                })
-              ) : (
-                <div className="text-center py-8 px-4">
-                  <p className="text-gray-500 text-lg">Приглашение пока пустое. Блоки будут добавлены позже.</p>
-                </div>
-              )}
+                  })
+              })()}
             </div>
           </div>
         </div>

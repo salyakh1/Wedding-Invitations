@@ -190,7 +190,11 @@ export default function ConstructorPage() {
     
     setSaving(true)
     try {
-      const { error } = await supabase
+      console.log('Saving invitation:', currentInvitation.id)
+      console.log('Blocks to save:', currentInvitation.blocks)
+      console.log('Blocks count:', currentInvitation.blocks?.length || 0)
+      
+      const { data, error } = await supabase
         .from('invitations')
         .update({
           title: currentInvitation.title,
@@ -199,17 +203,28 @@ export default function ConstructorPage() {
           background_music: currentInvitation.backgroundMusic,
           font_family: currentInvitation.fontFamily,
           font_size: currentInvitation.fontSize,
-          blocks: currentInvitation.blocks
+          blocks: currentInvitation.blocks || []
         })
         .eq('id', currentInvitation.id)
+        .select()
+        .single()
 
-      if (error) throw error
+      if (error) {
+        console.error('Supabase save error:', error)
+        throw error
+      }
+      
+      console.log('Invitation saved successfully:', data)
+      console.log('Saved blocks:', data.blocks)
       
       setInvitations(prev => 
         prev.map(inv => inv.id === currentInvitation.id ? currentInvitation : inv)
       )
+      
+      alert('Приглашение сохранено!')
     } catch (error) {
       console.error('Error saving invitation:', error)
+      alert(`Ошибка сохранения: ${error instanceof Error ? error.message : String(error)}`)
     } finally {
       setSaving(false)
     }
