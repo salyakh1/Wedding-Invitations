@@ -22,7 +22,7 @@ export default function NamesBlock({ block, isSelected, onMouseDown, invitation,
       } relative backdrop-blur-sm bg-white/20 shadow-xl hover:shadow-2xl transition-all duration-300 p-4 flex flex-col items-center justify-center overflow-hidden`}
       onMouseDown={onMouseDown}
       style={{
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
         border: '1px solid rgba(255,255,255,0.2)',

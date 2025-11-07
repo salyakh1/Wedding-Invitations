@@ -71,7 +71,7 @@ export default function WishesBlock({ block, isSelected, onUpdate, onMouseDown, 
       } relative overflow-hidden`}
       onMouseDown={!isPreview ? onMouseDown : undefined}
       style={{
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
         border: '1px solid rgba(255,255,255,0.2)',
@@ -84,7 +84,7 @@ export default function WishesBlock({ block, isSelected, onUpdate, onMouseDown, 
       <div 
         className="absolute inset-0 w-full h-full"
         style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
           backdropFilter: 'blur(10px)',
           WebkitBackdropFilter: 'blur(10px)',
           pointerEvents: 'none'
