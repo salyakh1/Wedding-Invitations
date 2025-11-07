@@ -12,6 +12,8 @@ import MapBlock from '../../components/blocks/MapBlock'
 import StoryBlock from '../../components/blocks/StoryBlock'
 import WishesBlock from '../../components/blocks/WishesBlock'
 import WishesSliderBlock from '../../components/blocks/WishesSliderBlock'
+import CountdownBlock from '../../components/blocks/CountdownBlock'
+import WeddingDateBlock from '../../components/blocks/WeddingDateBlock'
 
 export default function InvitationViewPage() {
   const params = useParams()
@@ -19,6 +21,7 @@ export default function InvitationViewPage() {
   const [invitation, setInvitation] = useState<Invitation | null>(null)
   const [wishes, setWishes] = useState<Wish[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (invitationId) {
@@ -29,13 +32,23 @@ export default function InvitationViewPage() {
 
   const loadInvitation = async () => {
     try {
+      setError(null)
       const { data, error } = await supabase
         .from('invitations')
         .select('*')
         .eq('id', invitationId)
         .single()
 
-      if (error) throw error
+      if (error) {
+        console.error('Supabase error:', error)
+        setError(`Ошибка загрузки: ${error.message}`)
+        throw error
+      }
+      
+      if (!data) {
+        setError('Приглашение не найдено')
+        return
+      }
       
       // Маппим данные из snake_case в camelCase
       const mappedInvitation = {
@@ -51,9 +64,13 @@ export default function InvitationViewPage() {
         updatedAt: data.updated_at
       }
       
+      console.log('Loaded invitation:', mappedInvitation)
+      console.log('Blocks count:', mappedInvitation.blocks.length)
+      
       setInvitation(mappedInvitation)
     } catch (error) {
       console.error('Error loading invitation:', error)
+      setError('Не удалось загрузить приглашение. Проверьте ссылку.')
     } finally {
       setLoading(false)
     }
@@ -141,7 +158,12 @@ export default function InvitationViewPage() {
         return <WishesBlock {...commonProps} invitationId={invitationId} onAddWish={addWish} />
       case 'wishes-slider':
         return <WishesSliderBlock {...commonProps} wishes={wishes} />
+      case 'countdown':
+        return <CountdownBlock {...commonProps} />
+      case 'wedding-date':
+        return <WeddingDateBlock {...commonProps} />
       default:
+        console.warn('Unknown block type:', block.type)
         return null
     }
   }
@@ -157,15 +179,21 @@ export default function InvitationViewPage() {
     )
   }
 
-  if (!invitation) {
+  if (error || !invitation) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
+        <div className="text-center px-4">
           <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-gray-400 text-2xl">💒</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Приглашение не найдено</h1>
-          <p className="text-gray-600">Возможно, ссылка неверна или приглашение было удалено.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            {error || 'Приглашение не найдено'}
+          </h1>
+          <p className="text-gray-600">
+            {error 
+              ? 'Проверьте правильность ссылки или попробуйте позже.'
+              : 'Возможно, ссылка неверна или приглашение было удалено.'}
+          </p>
         </div>
       </div>
     )
@@ -212,13 +240,14 @@ export default function InvitationViewPage() {
             )}
 
             {/* Render Blocks */}
-            {invitation.blocks
-              .sort((a, b) => {
-                if (a.type === 'background') return -1
-                if (b.type === 'background') return 1
-                return 0
-              })
-              .map((block, index) => {
+            {invitation.blocks && invitation.blocks.length > 0 ? (
+              invitation.blocks
+                .sort((a, b) => {
+                  if (a.type === 'background') return -1
+                  if (b.type === 'background') return 1
+                  return 0
+                })
+                .map((block, index) => {
                 // Для background блока - просто рендерим компонент
                 if (block.type === 'background') {
                   return (
@@ -282,7 +311,12 @@ export default function InvitationViewPage() {
                     {renderBlock(block)}
                   </div>
                 )
-              })}
+              })
+            ) : (
+              <div className="text-center py-8 px-4">
+                <p className="text-gray-500 text-lg">Приглашение пока пустое. Блоки будут добавлены позже.</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -345,14 +379,15 @@ export default function InvitationViewPage() {
 
             {/* Render Blocks - Mobile Optimized with Normal Flow */}
             <div className="relative w-full pb-8">
-              {invitation.blocks
-                .filter(b => b.type !== 'background')
-                .sort((a, b) => {
-                  const aY = a.position?.y || 0
-                  const bY = b.position?.y || 0
-                  return aY - bY
-                })
-                .map((block, index) => {
+              {invitation.blocks && invitation.blocks.length > 0 ? (
+                invitation.blocks
+                  .filter(b => b.type !== 'background')
+                  .sort((a, b) => {
+                    const aY = a.position?.y || 0
+                    const bY = b.position?.y || 0
+                    return aY - bY
+                  })
+                  .map((block, index) => {
                   
                   // Используем размеры из блока (на мобильных адаптируем)
                   const isStoryBlock = block.type === 'story'
@@ -375,7 +410,12 @@ export default function InvitationViewPage() {
                       {renderBlock(block)}
                     </div>
                   )
-                })}
+                })
+              ) : (
+                <div className="text-center py-8 px-4">
+                  <p className="text-gray-500 text-lg">Приглашение пока пустое. Блоки будут добавлены позже.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
