@@ -284,12 +284,63 @@ export default function ConstructorPage() {
     e.stopPropagation() // Предотвращаем выбор приглашения при клике на кнопку
     
     try {
-      // Получаем текущий домен (production или localhost)
+      // Получаем production URL
       let baseUrl = ''
       if (typeof window !== 'undefined') {
-        // Если мы на production (vercel.app), используем текущий origin
-        // Если на localhost, используем localhost (для тестирования)
-        baseUrl = window.location.origin
+        const hostname = window.location.hostname
+        
+        // Если на localhost - используем localhost
+        if (hostname === 'localhost' || hostname === '127.0.0.1') {
+          baseUrl = window.location.origin
+        }
+        // Если на Vercel preview URL (содержит много дефисов)
+        else if (hostname.includes('.vercel.app')) {
+          // Preview URLs Vercel имеют формат: project-name-xxx-username.vercel.app
+          // Production URL обычно: project-name.vercel.app
+          // Определяем, является ли это preview URL (содержит более 2 дефисов в subdomain)
+          const subdomain = hostname.split('.')[0]
+          const dashCount = (subdomain.match(/-/g) || []).length
+          
+          // Если это preview URL (много дефисов), пытаемся определить production URL
+          if (dashCount > 2) {
+            // Используем переменную окружения, если доступна
+            const productionUrl = process.env.NEXT_PUBLIC_SITE_URL
+            if (productionUrl) {
+              baseUrl = productionUrl
+            } else {
+              // Пытаемся автоматически определить production URL из preview URL
+              // Preview: wedding-invitations-xxx-yyy.vercel.app
+              // Production: wedding-invitations.vercel.app
+              // Обычно production домен - это первые 1-2 части subdomain (название проекта)
+              const parts = hostname.split('.')
+              const subdomain = parts[0]
+              const subdomainParts = subdomain.split('-')
+              
+              // Если в subdomain больше 2 частей, то первые 1-2 части - это название проекта
+              // Например: wedding-invitations-xxx-yyy -> wedding-invitations
+              let possibleProductionSubdomain = ''
+              if (subdomainParts.length > 2) {
+                // Берем первые две части (обычно это название проекта)
+                possibleProductionSubdomain = subdomainParts.slice(0, 2).join('-')
+              } else {
+                // Если частей 2 или меньше, используем весь subdomain
+                possibleProductionSubdomain = subdomain
+              }
+              
+              // Строим возможный production URL
+              const possibleProductionUrl = `https://${possibleProductionSubdomain}.vercel.app`
+              baseUrl = possibleProductionUrl
+              
+              console.warn(`Используется автоматически определенный production URL: ${baseUrl}. Для точности установите NEXT_PUBLIC_SITE_URL=https://${possibleProductionSubdomain}.vercel.app в настройках Vercel.`)
+            }
+          } else {
+            // Это уже production URL или кастомный домен
+            baseUrl = window.location.origin
+          }
+        } else {
+          // Другой домен (production или кастомный)
+          baseUrl = window.location.origin
+        }
       }
       
       const invitationUrl = `${baseUrl}/invitation/${invitationId}`
