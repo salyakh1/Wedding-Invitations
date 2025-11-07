@@ -173,8 +173,8 @@ export default function InvitationViewPage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
+      {/* Header - только для десктопа */}
+      <header className="hidden md:block bg-white shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-6">
           <h1 className="text-3xl font-bold text-center text-gray-900 font-playfair">
             {invitation.title}
@@ -183,7 +183,7 @@ export default function InvitationViewPage() {
       </header>
 
       {/* Invitation Content */}
-      <div className="max-w-4xl mx-auto p-4">
+      <div className="max-w-4xl mx-auto md:p-4">
         {/* Desktop View */}
         <div className="hidden md:block">
           <div
@@ -286,126 +286,100 @@ export default function InvitationViewPage() {
           </div>
         </div>
 
-        {/* Mobile View */}
+        {/* Mobile View - Scrollable */}
         <div className="md:hidden">
+          {/* Fixed Background Layer */}
           <div
-            className="relative mx-auto bg-white shadow-lg rounded-lg overflow-hidden"
+            className="fixed inset-0 -z-10"
             style={{
-              width: '100%',
-              minHeight: '100vh',
-              height: 'auto',
-              fontFamily: invitation.fontFamily,
-              fontSize: `${Math.max(14, invitation.fontSize * 0.8)}px`,
               backgroundImage: invitation.backgroundImage ? `url(${invitation.backgroundImage})` : undefined,
               backgroundColor: invitation.backgroundColor,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat'
             }}
+          />
+          
+          {/* Background Block Overlay */}
+          {invitation.blocks
+            .filter(b => b.type === 'background')
+            .map((block) => (
+              <div
+                key={block.id}
+                className="fixed inset-0 -z-10"
+                style={{
+                  opacity: block.opacity !== undefined ? block.opacity : 1,
+                  backgroundImage: block.data?.image ? `url(${block.data.image})` : undefined,
+                  backgroundColor: block.data?.color || 'transparent',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat'
+                }}
+              />
+            ))}
+
+          {/* Scrollable Content */}
+          <div
+            className="relative w-full min-h-screen"
+            style={{
+              fontFamily: invitation.fontFamily,
+              fontSize: `${Math.max(14, invitation.fontSize * 0.8)}px`
+            }}
           >
             {/* Background Music Player */}
             {invitation.backgroundMusic && (
-              <div className="absolute top-2 right-2 z-10">
-                <audio controls loop className="w-32">
+              <div className="sticky top-2 right-2 z-50 flex justify-end p-2">
+                <audio controls loop className="w-32 bg-white/80 rounded-lg">
                   <source src={invitation.backgroundMusic} type="audio/mpeg" />
                   Ваш браузер не поддерживает аудио элемент.
                 </audio>
               </div>
             )}
 
-            {/* Render Blocks - Mobile Optimized */}
-            {invitation.blocks
-              .sort((a, b) => {
-                if (a.type === 'background') return -1
-                if (b.type === 'background') return 1
-                return 0
-              })
-              .map((block, index) => {
-                // Для background блока - просто рендерим компонент
-                if (block.type === 'background') {
+            {/* Title for Mobile */}
+            <div className="px-4 pt-4 pb-2">
+              <h1 className="text-2xl font-bold text-center text-gray-900" style={{ fontFamily: invitation.fontFamily }}>
+                {invitation.title}
+              </h1>
+            </div>
+
+            {/* Render Blocks - Mobile Optimized with Normal Flow */}
+            <div className="relative w-full pb-8">
+              {invitation.blocks
+                .filter(b => b.type !== 'background')
+                .sort((a, b) => {
+                  const aY = a.position?.y || 0
+                  const bY = b.position?.y || 0
+                  return aY - bY
+                })
+                .map((block, index) => {
+                  
+                  // Используем размеры из блока (на мобильных адаптируем)
+                  const isStoryBlock = block.type === 'story'
+                  const blockHeight = block.size?.height || 150
+                  const mobileHeight = isStoryBlock ? 'auto' : `${Math.max(blockHeight * 0.8, 120)}px`
+                  const minHeight = isStoryBlock ? `${Math.max(blockHeight * 0.8, 120)}px` : undefined
+                  
                   return (
                     <div
                       key={block.id}
-                      className="absolute inset-0"
+                      className="relative mx-2 mb-4"
                       style={{
+                        width: 'calc(100% - 16px)',
+                        height: mobileHeight,
+                        minHeight: minHeight,
                         opacity: block.opacity !== undefined ? block.opacity : 1,
-                        zIndex: 1
+                        zIndex: 10
                       }}
                     >
                       {renderBlock(block)}
                     </div>
                   )
-                }
-                
-                // Для остальных блоков - вертикальное позиционирование
-                const blockSpacing = 20
-                // Сортируем блоки без background по position.y (порядок добавления)
-                const nonBackgroundBlocks = invitation.blocks
-                  .filter(b => b.type !== 'background')
-                  .sort((a, b) => {
-                    const aY = a.position?.y || 0
-                    const bY = b.position?.y || 0
-                    return aY - bY
-                  })
-                const blockIndex = nonBackgroundBlocks.findIndex(b => b.id === block.id)
-                
-                // Вычисляем Y позицию на основе предыдущих блоков
-                let y = 20
-                for (let i = 0; i < blockIndex; i++) {
-                  const prevBlock = nonBackgroundBlocks[i]
-                  const prevHeight = prevBlock.type === 'story' 
-                    ? (prevBlock.size?.height || 150) + 20
-                    : (prevBlock.size?.height || 150)
-                  y += prevHeight + blockSpacing
-                }
-                
-                // Используем размеры из блока (на мобильных немного уменьшаем)
-                const isStoryBlock = block.type === 'story'
-                const blockWidth = block.size?.width || 760
-                const blockHeight = block.size?.height || 150
-                // На мобильных используем full width, но сохраняем пропорции высоты
-                const mobileWidth = 'calc(100% - 20px)'
-                const currentHeight = isStoryBlock ? 'auto' : `${Math.max(blockHeight * 0.75, 120)}px`
-                const minHeight = isStoryBlock ? `${Math.max(blockHeight * 0.75, 120)}px` : undefined
-                
-                return (
-                  <div
-                    key={block.id}
-                    className="absolute"
-                    style={{
-                      left: '10px',
-                      top: `${y}px`,
-                      width: mobileWidth,
-                      height: currentHeight,
-                      minHeight: minHeight,
-                      opacity: block.opacity !== undefined ? block.opacity : 1,
-                      zIndex: 10,
-                      pointerEvents: 'auto'
-                    }}
-                  >
-                    {renderBlock(block)}
-                  </div>
-                )
-              })}
+                })}
+            </div>
           </div>
         </div>
-
-        {/* Mobile Responsive Message */}
-        <div className="mt-8 text-center">
-          <p className="text-gray-600 text-sm">
-            Для лучшего просмотра откройте приглашение на компьютере или планшете
-          </p>
-        </div>
       </div>
-
-      {/* Footer */}
-      <footer className="bg-white border-t mt-12">
-        <div className="max-w-4xl mx-auto px-4 py-6 text-center">
-          <p className="text-gray-600">
-            Создано с помощью Wedding Invitation Service
-          </p>
-        </div>
-      </footer>
     </div>
   )
 }
