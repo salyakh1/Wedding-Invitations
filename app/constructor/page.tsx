@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../providers'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
@@ -24,30 +24,8 @@ export default function ConstructorPage() {
   const [selectedBlock, setSelectedBlock] = useState<InvitationBlock | null>(null)
   const [showInvitationsList, setShowInvitationsList] = useState(false)
 
-  useEffect(() => {
-    if (!user) {
-      router.push('/')
-      return
-    }
-    loadInvitations()
-  }, [user, router])
-
-  // Закрытие dropdown при клике вне его
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement
-      if (!target.closest('.invitations-dropdown')) {
-        setShowInvitationsList(false)
-      }
-    }
-    
-    if (showInvitationsList) {
-      document.addEventListener('mousedown', handleClickOutside)
-      return () => document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [showInvitationsList])
-
-  const loadInvitations = async () => {
+  // Функция загрузки приглашений
+  const loadInvitations = useCallback(async () => {
     try {
       if (!user) {
         console.log('No user found, skipping load invitations')
@@ -66,6 +44,7 @@ export default function ConstructorPage() {
       if (error) {
         console.error('Supabase error loading invitations:', error)
         alert(`Ошибка загрузки приглашений: ${error.message}`)
+        setLoading(false)
         return
       }
       
@@ -80,24 +59,57 @@ export default function ConstructorPage() {
         backgroundMusic: invitation.background_music,
         fontFamily: invitation.font_family,
         fontSize: invitation.font_size,
-        blocks: invitation.blocks,
+        blocks: invitation.blocks || [],
         createdAt: invitation.created_at,
         updatedAt: invitation.updated_at
       }))
       
       setInvitations(mappedInvitations)
       
-      // Если есть приглашения и текущее не выбрано, выбираем первое
-      if (mappedInvitations.length > 0 && !currentInvitation) {
-        setCurrentInvitation(mappedInvitations[0])
-      }
+      // Если есть приглашения, выбираем первое (только если текущее не выбрано)
+      setCurrentInvitation(prev => {
+        if (prev) return prev
+        return mappedInvitations.length > 0 ? mappedInvitations[0] : null
+      })
     } catch (error) {
       console.error('Error loading invitations:', error)
       alert(`Ошибка: ${error}`)
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
+
+  // Защита: редирект если user == null
+  useEffect(() => {
+    if (user === null) {
+      router.push('/')
+      return
+    }
+  }, [user, router])
+
+  // Загрузка приглашений только если user существует
+  useEffect(() => {
+    if (user) {
+      loadInvitations()
+    } else {
+      setLoading(false)
+    }
+  }, [user, loadInvitations])
+
+  // Закрытие dropdown при клике вне его
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement
+      if (!target.closest('.invitations-dropdown')) {
+        setShowInvitationsList(false)
+      }
+    }
+    
+    if (showInvitationsList) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showInvitationsList])
 
   const createNewInvitation = async () => {
     try {
@@ -261,7 +273,8 @@ export default function ConstructorPage() {
     }
   }
 
-  if (loading) {
+  // Защита: не рендерим контент если user == null
+  if (!user || loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
