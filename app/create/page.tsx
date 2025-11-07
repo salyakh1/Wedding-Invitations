@@ -284,8 +284,14 @@ export default function ConstructorPage() {
     e.stopPropagation() // Предотвращаем выбор приглашения при клике на кнопку
     
     try {
-      // Получаем текущий домен
-      const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
+      // Получаем текущий домен (production или localhost)
+      let baseUrl = ''
+      if (typeof window !== 'undefined') {
+        // Если мы на production (vercel.app), используем текущий origin
+        // Если на localhost, используем localhost (для тестирования)
+        baseUrl = window.location.origin
+      }
+      
       const invitationUrl = `${baseUrl}/invitation/${invitationId}`
       
       // Копируем в буфер обмена

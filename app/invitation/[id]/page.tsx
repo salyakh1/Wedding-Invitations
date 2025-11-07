@@ -36,7 +36,22 @@ export default function InvitationViewPage() {
         .single()
 
       if (error) throw error
-      setInvitation(data)
+      
+      // Маппим данные из snake_case в camelCase
+      const mappedInvitation = {
+        id: data.id,
+        title: data.title,
+        backgroundImage: data.background_image,
+        backgroundColor: data.background_color,
+        backgroundMusic: data.background_music,
+        fontFamily: data.font_family,
+        fontSize: data.font_size,
+        blocks: data.blocks || [],
+        createdAt: data.created_at,
+        updatedAt: data.updated_at
+      }
+      
+      setInvitation(mappedInvitation)
     } catch (error) {
       console.error('Error loading invitation:', error)
     } finally {
