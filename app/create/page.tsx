@@ -10,7 +10,7 @@ import InvitationCanvas from '../components/InvitationCanvas'
 import SettingsPanel from '../components/SettingsPanel'
 import BlockSettingsPanel from '../components/BlockSettingsPanel'
 import PhoneMockup from '../components/iPhoneMockup'
-import { LogOut, Save, Eye, Plus, Smartphone, Settings, ChevronDown, FileText, Trash2 } from 'lucide-react'
+import { LogOut, Save, Eye, Plus, Smartphone, Settings, ChevronDown, FileText, Trash2, Share2, Check } from 'lucide-react'
 
 export default function ConstructorPage() {
   const { user, signOut } = useAuth()
@@ -23,6 +23,7 @@ export default function ConstructorPage() {
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop')
   const [selectedBlock, setSelectedBlock] = useState<InvitationBlock | null>(null)
   const [showInvitationsList, setShowInvitationsList] = useState(false)
+  const [copiedInvitationId, setCopiedInvitationId] = useState<string | null>(null)
 
   // Функция загрузки приглашений
   const loadInvitations = useCallback(async () => {
@@ -115,6 +116,12 @@ export default function ConstructorPage() {
     try {
       if (!user) {
         alert('Пользователь не аутентифицирован. Войдите в систему.')
+        return
+      }
+
+      // Проверка на максимальное количество приглашений (10)
+      if (invitations.length >= 10) {
+        alert('Максимум 10 приглашений. Удалите одно из существующих приглашений, чтобы создать новое.')
         return
       }
 
@@ -273,6 +280,28 @@ export default function ConstructorPage() {
     }
   }
 
+  const copyInvitationLink = async (invitationId: string, e: React.MouseEvent) => {
+    e.stopPropagation() // Предотвращаем выбор приглашения при клике на кнопку
+    
+    try {
+      // Получаем текущий домен
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
+      const invitationUrl = `${baseUrl}/invitation/${invitationId}`
+      
+      // Копируем в буфер обмена
+      await navigator.clipboard.writeText(invitationUrl)
+      
+      // Показываем уведомление
+      setCopiedInvitationId(invitationId)
+      setTimeout(() => {
+        setCopiedInvitationId(null)
+      }, 2000)
+    } catch (error) {
+      console.error('Error copying link:', error)
+      alert('Не удалось скопировать ссылку. Попробуйте еще раз.')
+    }
+  }
+
   // Защита: не рендерим контент если user == null
   if (!user || loading) {
     return (
@@ -310,8 +339,17 @@ export default function ConstructorPage() {
                 {showInvitationsList && (
                   <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
                     <div className="p-2">
-                      <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase">
-                        Мои приглашения ({invitations.length})
+                      <div className={`px-3 py-2 text-xs font-semibold uppercase border-b mb-2 ${
+                        invitations.length >= 10 
+                          ? 'text-red-600' 
+                          : invitations.length >= 8 
+                            ? 'text-orange-600' 
+                            : 'text-gray-500'
+                      }`}>
+                        Мои приглашения ({invitations.length}/10)
+                        {invitations.length >= 10 && (
+                          <span className="ml-2 text-xs font-normal">(Лимит достигнут)</span>
+                        )}
                       </div>
                       {invitations.length === 0 ? (
                         <div className="px-3 py-4 text-sm text-gray-500 text-center">
@@ -327,22 +365,39 @@ export default function ConstructorPage() {
                           >
                             <button
                               onClick={() => selectInvitation(inv)}
-                              className="w-full text-left"
+                              className="w-full text-left pr-20"
                             >
-                              <div className="font-medium text-sm text-gray-900 truncate pr-8">
+                              <div className="font-medium text-sm text-gray-900 truncate">
                                 {inv.title}
                               </div>
                               <div className="text-xs text-gray-500 mt-1">
                                 {new Date(inv.createdAt).toLocaleDateString('ru-RU')} • {inv.blocks.length} блоков
                               </div>
                             </button>
-                            <button
-                              onClick={(e) => deleteInvitation(inv.id, e)}
-                              className="absolute top-2 right-2 p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors opacity-0 group-hover:opacity-100"
-                              title="Удалить приглашение"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+                            <div className="absolute top-2 right-2 flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button
+                                onClick={(e) => copyInvitationLink(inv.id, e)}
+                                className={`p-1.5 rounded transition-colors ${
+                                  copiedInvitationId === inv.id
+                                    ? 'text-green-500 bg-green-50'
+                                    : 'text-blue-400 hover:text-blue-500 hover:bg-blue-50'
+                                }`}
+                                title={copiedInvitationId === inv.id ? 'Ссылка скопирована!' : 'Поделиться ссылкой'}
+                              >
+                                {copiedInvitationId === inv.id ? (
+                                  <Check className="w-4 h-4" />
+                                ) : (
+                                  <Share2 className="w-4 h-4" />
+                                )}
+                              </button>
+                              <button
+                                onClick={(e) => deleteInvitation(inv.id, e)}
+                                className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                                title="Удалить приглашение"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
                           </div>
                         ))
                       )}
@@ -354,7 +409,13 @@ export default function ConstructorPage() {
               <div className="flex space-x-2">
                 <button
                   onClick={createNewInvitation}
-                  className="flex items-center space-x-2 px-3 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
+                  disabled={invitations.length >= 10}
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
+                    invitations.length >= 10
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-pink-500 text-white hover:bg-pink-600'
+                  }`}
+                  title={invitations.length >= 10 ? 'Максимум 10 приглашений. Удалите одно из существующих.' : 'Создать новое приглашение'}
                 >
                   <Plus className="w-4 h-4" />
                   <span>Новое</span>
