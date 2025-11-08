@@ -252,14 +252,13 @@ export default function InvitationViewPage() {
             )}
 
             {/* Render Blocks */}
-            {invitation.blocks && invitation.blocks.length > 0 ? (
-              invitation.blocks
-                .sort((a, b) => {
-                  if (a.type === 'background') return -1
-                  if (b.type === 'background') return 1
-                  return 0
-                })
-                .map((block, index) => {
+            {invitation.blocks
+              .sort((a, b) => {
+                if (a.type === 'background') return -1
+                if (b.type === 'background') return 1
+                return 0
+              })
+              .map((block, index) => {
                 // Для background блока - просто рендерим компонент
                 if (block.type === 'background') {
                   return (
@@ -323,12 +322,7 @@ export default function InvitationViewPage() {
                     {renderBlock(block)}
                   </div>
                 )
-              })
-            ) : (
-              <div className="text-center py-8 px-4">
-                <p className="text-gray-500 text-lg">Приглашение пока пустое. Блоки будут добавлены позже.</p>
-              </div>
-            )}
+              })}
           </div>
         </div>
 
@@ -391,41 +385,14 @@ export default function InvitationViewPage() {
 
             {/* Render Blocks - Mobile Optimized with Normal Flow */}
             <div className="relative w-full pb-8">
-              {(() => {
-                console.log('=== RENDERING BLOCKS ===')
-                console.log('All blocks:', invitation.blocks)
-                console.log('Blocks count:', invitation.blocks?.length || 0)
-                
-                if (!invitation.blocks || invitation.blocks.length === 0) {
-                  console.log('No blocks to render')
-                  return (
-                    <div className="text-center py-8 px-4">
-                      <p className="text-gray-500 text-lg">Приглашение пока пустое. Блоки будут добавлены позже.</p>
-                    </div>
-                  )
-                }
-                
-                const nonBackgroundBlocks = invitation.blocks.filter(b => b.type !== 'background')
-                console.log('Non-background blocks:', nonBackgroundBlocks)
-                console.log('Non-background blocks count:', nonBackgroundBlocks.length)
-                
-                if (nonBackgroundBlocks.length === 0) {
-                  console.log('No non-background blocks to render')
-                  return (
-                    <div className="text-center py-8 px-4">
-                      <p className="text-gray-500 text-lg">Приглашение пока пустое. Добавьте блоки в конструкторе.</p>
-                    </div>
-                  )
-                }
-                
-                return nonBackgroundBlocks
-                  .sort((a, b) => {
-                    const aY = a.position?.y || 0
-                    const bY = b.position?.y || 0
-                    return aY - bY
-                  })
-                  .map((block, index) => {
-                    console.log(`Rendering block ${index}:`, block.type, block)
+              {invitation.blocks
+                .filter(b => b.type !== 'background')
+                .sort((a, b) => {
+                  const aY = a.position?.y || 0
+                  const bY = b.position?.y || 0
+                  return aY - bY
+                })
+                .map((block, index) => {
                   
                   // Используем размеры из блока (на мобильных адаптируем)
                   const isStoryBlock = block.type === 'story'
@@ -448,8 +415,7 @@ export default function InvitationViewPage() {
                       {renderBlock(block)}
                     </div>
                   )
-                  })
-              })()}
+                })}
             </div>
           </div>
         </div>
