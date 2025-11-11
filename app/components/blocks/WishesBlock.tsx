@@ -21,6 +21,13 @@ export default function WishesBlock({ block, isSelected, onUpdate, onMouseDown, 
   const [message, setMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const transparency = Math.max(0, Math.min(block.opacity ?? 1, 1))
+  const gradientStart = (0.25 * transparency).toFixed(3)
+  const gradientEnd = (0.12 * transparency).toFixed(3)
+  const borderAlpha = (0.35 * transparency).toFixed(3)
+  const shadowAlpha = (0.18 * transparency).toFixed(3)
+  const inputOverlay = (0.14 * transparency).toFixed(3)
+
   const updateData = (updates: any) => {
     onUpdate({
       data: { ...block.data, ...updates }
@@ -71,26 +78,15 @@ export default function WishesBlock({ block, isSelected, onUpdate, onMouseDown, 
       } relative overflow-hidden`}
       onMouseDown={!isPreview ? onMouseDown : undefined}
       style={{
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-        border: '1px solid rgba(255,255,255,0.2)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+        background: `linear-gradient(135deg, rgba(255,255,255,${gradientStart}) 0%, rgba(255,255,255,${gradientEnd}) 100%)`,
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
+        border: `1px solid rgba(255,255,255,${borderAlpha})`,
+        boxShadow: `0 18px 40px rgba(15,23,42,${shadowAlpha})`,
         minHeight: '100%',
         pointerEvents: 'auto'
       }}
     >
-      {/* Background Layer */}
-      <div 
-        className="absolute inset-0 w-full h-full"
-        style={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)',
-          pointerEvents: 'none'
-        }}
-      />
-      
       {/* Content Layer */}
       <div className="relative z-10 w-full h-full p-4 flex flex-col items-center justify-center" style={{ pointerEvents: 'auto' }}>
         {/* Block Label */}
@@ -127,9 +123,9 @@ export default function WishesBlock({ block, isSelected, onUpdate, onMouseDown, 
                 type="text"
                 value={block.data.placeholder || 'Оставьте пожелание...'}
                 onChange={(e) => updateData({ placeholder: e.target.value })}
-                className="w-full px-4 py-3 border-0 rounded-xl bg-white/20 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                className="w-full px-4 py-3 border-0 rounded-xl backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                 placeholder="Placeholder для поля сообщения"
-                style={{ background: 'rgba(255,255,255,0.1)' }}
+                style={{ background: `rgba(255,255,255,${inputOverlay})` }}
               />
             </div>
           </div>
@@ -155,10 +151,10 @@ export default function WishesBlock({ block, isSelected, onUpdate, onMouseDown, 
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3 border-0 rounded-xl bg-white/20 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
+                  className="w-full px-4 py-3 border-0 rounded-xl backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200"
                   placeholder="Ваше имя"
                   required
-                  style={{ background: 'rgba(255,255,255,0.1)' }}
+                  style={{ background: `rgba(255,255,255,${inputOverlay})` }}
                 />
               </div>
 
@@ -166,11 +162,11 @@ export default function WishesBlock({ block, isSelected, onUpdate, onMouseDown, 
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  className="w-full px-4 py-3 border-0 rounded-xl bg-white/20 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 resize-none"
+                  className="w-full px-4 py-3 border-0 rounded-xl backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all duration-200 resize-none"
                   placeholder={block.data.placeholder || 'Оставьте пожелание...'}
                   rows={4}
                   required
-                  style={{ background: 'rgba(255,255,255,0.1)' }}
+                  style={{ background: `rgba(255,255,255,${inputOverlay})` }}
                 />
               </div>
 

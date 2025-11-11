@@ -13,19 +13,24 @@ interface VideoBlockProps {
 }
 
 export default function VideoBlock({ block, isSelected, onMouseDown, isPreview = false }: VideoBlockProps) {
+  const transparency = Math.max(0, Math.min(block.opacity ?? 1, 1))
+  const gradientStart = (0.25 * transparency).toFixed(3)
+  const gradientEnd = (0.12 * transparency).toFixed(3)
+  const borderAlpha = (0.35 * transparency).toFixed(3)
+  const shadowAlpha = (0.18 * transparency).toFixed(3)
 
   return (
     <div
       className={`w-full h-full rounded-xl border-2 ${
         isSelected ? 'border-blue-500 shadow-lg' : 'border-transparent'
-      } relative backdrop-blur-sm bg-white/20 shadow-xl hover:shadow-2xl transition-all duration-300 p-4 flex flex-col items-center justify-center overflow-hidden`}
+      } relative backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 p-4 flex flex-col items-center justify-center overflow-hidden`}
       onMouseDown={onMouseDown}
       style={{
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-        border: '1px solid rgba(255,255,255,0.2)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+        background: `linear-gradient(135deg, rgba(255,255,255,${gradientStart}) 0%, rgba(255,255,255,${gradientEnd}) 100%)`,
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
+        border: `1px solid rgba(255,255,255,${borderAlpha})`,
+        boxShadow: `0 18px 40px rgba(15,23,42,${shadowAlpha})`,
         minHeight: '100%'
       }}
     >

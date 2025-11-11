@@ -204,7 +204,6 @@ export default function InvitationCanvas({ invitation, onUpdateInvitation, selec
                       key={block.id}
                       className="absolute inset-0"
                       style={{
-                        opacity: block.opacity !== undefined ? block.opacity : 1,
                         zIndex: 1
                       }}
                     >
@@ -253,7 +252,6 @@ export default function InvitationCanvas({ invitation, onUpdateInvitation, selec
                       width: `${blockWidth}px`,
                       height: currentHeight,
                       minHeight: minHeight,
-                      opacity: block.opacity !== undefined ? block.opacity : 1,
                       zIndex: localSelectedBlock === block.id ? 1000 : 10
                     }}
                   >

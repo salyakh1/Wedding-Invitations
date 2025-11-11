@@ -266,13 +266,19 @@ export default function InvitationViewPage() {
                       key={block.id}
                       className="absolute inset-0"
                       style={{
-                        opacity: block.opacity !== undefined ? block.opacity : 1,
                         zIndex: 1
                       }}
                     >
                       {renderBlock(block)}
                     </div>
                   )
+                }
+
+                if (
+                  block.type === 'story' &&
+                  ((!block.data?.items || block.data.items.length === 0) && !block.data?.title)
+                ) {
+                  return null
                 }
                 
                 // Для остальных блоков - вертикальное позиционирование
@@ -314,7 +320,6 @@ export default function InvitationViewPage() {
                       width: `${blockWidth}px`,
                       height: currentHeight,
                       minHeight: minHeight,
-                      opacity: block.opacity !== undefined ? block.opacity : 1,
                       zIndex: 10,
                       pointerEvents: 'auto'
                     }}
@@ -348,7 +353,6 @@ export default function InvitationViewPage() {
                 key={block.id}
                 className="fixed inset-0 -z-10"
                 style={{
-                  opacity: block.opacity !== undefined ? block.opacity : 1,
                   backgroundImage: block.data?.image ? `url(${block.data.image})` : undefined,
                   backgroundColor: block.data?.color || 'transparent',
                   backgroundSize: 'cover',
@@ -394,6 +398,13 @@ export default function InvitationViewPage() {
                 })
                 .map((block, index) => {
                   
+                  if (
+                    block.type === 'story' &&
+                    ((!block.data?.items || block.data.items.length === 0) && !block.data?.title)
+                  ) {
+                    return null
+                  }
+                  
                   // Используем размеры из блока (на мобильных адаптируем)
                   const isStoryBlock = block.type === 'story'
                   const blockHeight = block.size?.height || 150
@@ -408,7 +419,6 @@ export default function InvitationViewPage() {
                         width: 'calc(100% - 16px)',
                         height: mobileHeight,
                         minHeight: minHeight,
-                        opacity: block.opacity !== undefined ? block.opacity : 1,
                         zIndex: 10
                       }}
                     >

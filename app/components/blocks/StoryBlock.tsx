@@ -15,6 +15,11 @@ interface StoryBlockProps {
 
 export default function StoryBlock({ block, isSelected, onMouseDown, invitation, isPreview = false }: StoryBlockProps) {
   const items = block.data?.items || []
+  const transparency = Math.max(0, Math.min(block.opacity ?? 1, 1))
+  const gradientStart = (0.25 * transparency).toFixed(3)
+  const gradientEnd = (0.12 * transparency).toFixed(3)
+  const borderAlpha = (0.35 * transparency).toFixed(3)
+  const shadowAlpha = (0.18 * transparency).toFixed(3)
   
   // Генерируем уникальный ID для SVG clipPath
   const heartClipId = useMemo(() => `heart-clip-${block.id}`, [block.id])
@@ -51,11 +56,12 @@ export default function StoryBlock({ block, isSelected, onMouseDown, invitation,
       style={{
         minHeight: '200px',
         height: 'auto',
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-        border: '1px solid rgba(255,255,255,0.2)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+        background: `linear-gradient(135deg, rgba(255,255,255,${gradientStart}) 0%, rgba(255,255,255,${gradientEnd}) 100%)`,
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
+        border: `1px solid rgba(255,255,255,${borderAlpha})`,
+        boxShadow: `0 18px 40px rgba(15,23,42,${shadowAlpha})`,
+        display: isPreview && items.length === 0 && !block.data?.title ? 'none' : undefined
       }}
     >
       {/* SVG Definition for Heart Shape - Elegant and Romantic */}
@@ -103,12 +109,16 @@ export default function StoryBlock({ block, isSelected, onMouseDown, invitation,
           {/* Items Sequence */}
           {items.length === 0 ? (
             <p 
-              className="text-gray-500 text-center text-sm"
-              style={{
-                fontFamily: invitation?.fontFamily || 'Montserrat',
-                fontSize: `${invitation?.fontSize || 16}px`,
-                color: invitation?.textColor || '#666'
-              }}
+              className={`text-gray-500 text-center text-sm ${isPreview ? 'hidden' : ''}`}
+              style={
+                isPreview
+                  ? undefined
+                  : {
+                      fontFamily: invitation?.fontFamily || 'Montserrat',
+                      fontSize: `${invitation?.fontSize || 16}px`,
+                      color: invitation?.textColor || '#666'
+                    }
+              }
             >
               Добавьте элементы истории...
             </p>

@@ -11,7 +11,8 @@ interface BackgroundBlockProps {
 }
 
 export default function BackgroundBlock({ block, isSelected, onMouseDown, isPreview = false }: BackgroundBlockProps) {
-
+  const transparency = Math.max(0, Math.min(block.opacity ?? 1, 1))
+  
   return (
     <div
       className={`w-full h-full rounded-lg border-2 ${
@@ -22,7 +23,8 @@ export default function BackgroundBlock({ block, isSelected, onMouseDown, isPrev
         backgroundColor: block.data.color || '#667eea',
         backgroundImage: block.data.image ? `url(${block.data.image})` : undefined,
         backgroundSize: 'cover',
-        backgroundPosition: 'center'
+        backgroundPosition: 'center',
+        opacity: transparency
       }}
     >
 

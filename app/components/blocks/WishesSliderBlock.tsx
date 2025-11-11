@@ -18,6 +18,13 @@ export default function WishesSliderBlock({ block, isSelected, onUpdate, onMouse
   const [isEditing, setIsEditing] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(0)
 
+  const transparency = Math.max(0, Math.min(block.opacity ?? 1, 1))
+  const gradientStart = (0.25 * transparency).toFixed(3)
+  const gradientEnd = (0.12 * transparency).toFixed(3)
+  const borderAlpha = (0.35 * transparency).toFixed(3)
+  const shadowAlpha = (0.18 * transparency).toFixed(3)
+  const innerOverlay = (0.22 * transparency).toFixed(3)
+
   const updateData = (updates: any) => {
     onUpdate({
       data: { ...block.data, ...updates }
@@ -67,14 +74,14 @@ export default function WishesSliderBlock({ block, isSelected, onUpdate, onMouse
     <div
       className={`w-full h-full rounded-xl border-2 ${
         isSelected ? 'border-blue-500 shadow-lg' : 'border-transparent'
-      } relative backdrop-blur-sm bg-white/20 shadow-xl hover:shadow-2xl transition-all duration-300 p-4 flex flex-col items-center justify-center`}
+      } relative backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 p-4 flex flex-col items-center justify-center`}
       onMouseDown={onMouseDown}
       style={{
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-        border: '1px solid rgba(255,255,255,0.2)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+        background: `linear-gradient(135deg, rgba(255,255,255,${gradientStart}) 0%, rgba(255,255,255,${gradientEnd}) 100%)`,
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
+        border: `1px solid rgba(255,255,255,${borderAlpha})`,
+        boxShadow: `0 18px 40px rgba(15,23,42,${shadowAlpha})`
       }}
     >
       {/* Block Label */}
@@ -143,7 +150,14 @@ export default function WishesSliderBlock({ block, isSelected, onUpdate, onMouse
             {/* Wish Display */}
             {displayWishes.length > 0 ? (
               <>
-                <div className="bg-white/30 backdrop-blur-sm rounded-xl p-6 shadow-lg">
+                <div
+                  className="rounded-xl p-6 shadow-lg"
+                  style={{
+                    background: `rgba(255,255,255,${innerOverlay})`,
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)'
+                  }}
+                >
                   <h4 className="font-bold text-gray-800 mb-3 text-center drop-shadow-sm">
                     {displayWishes[currentSlide]?.name || 'Гость'}
                   </h4>
@@ -157,7 +171,12 @@ export default function WishesSliderBlock({ block, isSelected, onUpdate, onMouse
                   <div className="flex items-center justify-between">
                     <button
                       onClick={prevSlide}
-                      className="p-3 bg-white/30 backdrop-blur-sm rounded-full hover:bg-white/50 transition-all duration-200 shadow-lg hover:shadow-xl"
+                      className="p-3 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl"
+                      style={{
+                        background: `rgba(255,255,255,${innerOverlay})`,
+                        backdropFilter: 'blur(12px)',
+                        WebkitBackdropFilter: 'blur(12px)'
+                      }}
                     >
                       ←
                     </button>
@@ -176,7 +195,12 @@ export default function WishesSliderBlock({ block, isSelected, onUpdate, onMouse
 
                     <button
                       onClick={nextSlide}
-                      className="p-3 bg-white/30 backdrop-blur-sm rounded-full hover:bg-white/50 transition-all duration-200 shadow-lg hover:shadow-xl"
+                      className="p-3 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl"
+                      style={{
+                        background: `rgba(255,255,255,${innerOverlay})`,
+                        backdropFilter: 'blur(12px)',
+                        WebkitBackdropFilter: 'blur(12px)'
+                      }}
                     >
                       →
                     </button>
@@ -184,7 +208,14 @@ export default function WishesSliderBlock({ block, isSelected, onUpdate, onMouse
                 )}
               </>
             ) : (
-              <div className="bg-white/30 backdrop-blur-sm rounded-xl p-6 shadow-lg text-center">
+              <div
+                className="rounded-xl p-6 shadow-lg text-center"
+                style={{
+                  background: `rgba(255,255,255,${innerOverlay})`,
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)'
+                }}
+              >
                 <p className="text-gray-600">Пока нет пожеланий</p>
                 <p className="text-sm text-gray-500 mt-2">Будьте первыми, кто оставит пожелание!</p>
               </div>
