@@ -21,11 +21,11 @@ export default function CountdownBlock({ block, isSelected, onMouseDown, isPrevi
     seconds: 0
   })
   const transparency = Math.max(0, Math.min(block.opacity ?? 1, 1))
-  const gradientStart = (0.25 * transparency).toFixed(3)
-  const gradientEnd = (0.12 * transparency).toFixed(3)
-  const borderAlpha = (0.35 * transparency).toFixed(3)
-  const shadowAlpha = (0.18 * transparency).toFixed(3)
-  const innerOverlay = (0.22 * transparency).toFixed(3)
+  const gradientStart = (0.18 * transparency).toFixed(3)
+  const gradientEnd = (0.06 * transparency).toFixed(3)
+  const borderAlpha = (0.28 * transparency).toFixed(3)
+  const shadowAlpha = (0.14 * transparency).toFixed(3)
+  const innerOverlay = (0.16 * transparency).toFixed(3)
 
   useEffect(() => {
     if (!block.data.weddingDate) return

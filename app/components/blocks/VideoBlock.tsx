@@ -14,10 +14,10 @@ interface VideoBlockProps {
 
 export default function VideoBlock({ block, isSelected, onMouseDown, isPreview = false }: VideoBlockProps) {
   const transparency = Math.max(0, Math.min(block.opacity ?? 1, 1))
-  const gradientStart = (0.25 * transparency).toFixed(3)
-  const gradientEnd = (0.12 * transparency).toFixed(3)
-  const borderAlpha = (0.35 * transparency).toFixed(3)
-  const shadowAlpha = (0.18 * transparency).toFixed(3)
+  const gradientStart = (0.18 * transparency).toFixed(3)
+  const gradientEnd = (0.06 * transparency).toFixed(3)
+  const borderAlpha = (0.28 * transparency).toFixed(3)
+  const shadowAlpha = (0.14 * transparency).toFixed(3)
 
   return (
     <div
