@@ -14,11 +14,11 @@ interface WeddingDateBlockProps {
 
 export default function WeddingDateBlock({ block, isSelected, onMouseDown, isPreview = false }: WeddingDateBlockProps) {
   const transparency = Math.max(0, Math.min(block.opacity ?? 1, 1))
-  const gradientStart = (0.18 * transparency).toFixed(3)
-  const gradientEnd = (0.06 * transparency).toFixed(3)
-  const borderAlpha = (0.28 * transparency).toFixed(3)
-  const shadowAlpha = (0.14 * transparency).toFixed(3)
-  const innerOverlay = (0.16 * transparency).toFixed(3)
+  const gradientStart = (0.05 * transparency).toFixed(3)
+  const gradientEnd = (0.02 * transparency).toFixed(3)
+  const borderAlpha = (0.15 * transparency).toFixed(3)
+  const shadowAlpha = (0.08 * transparency).toFixed(3)
+  const innerOverlay = (0.05 * transparency).toFixed(3)
 
   const formatDate = (dateString: string) => {
     if (!dateString) return ''
@@ -39,8 +39,8 @@ export default function WeddingDateBlock({ block, isSelected, onMouseDown, isPre
       onMouseDown={onMouseDown}
       style={{
         background: `linear-gradient(135deg, rgba(255,255,255,${gradientStart}) 0%, rgba(255,255,255,${gradientEnd}) 100%)`,
-        backdropFilter: 'blur(14px)',
-        WebkitBackdropFilter: 'blur(14px)',
+        backdropFilter: 'blur(6px)',
+        WebkitBackdropFilter: 'blur(6px)',
         border: `1px solid rgba(255,255,255,${borderAlpha})`,
         boxShadow: `0 18px 40px rgba(15,23,42,${shadowAlpha})`,
         minHeight: '100%'

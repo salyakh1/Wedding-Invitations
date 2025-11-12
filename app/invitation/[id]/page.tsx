@@ -22,6 +22,7 @@ export default function InvitationViewPage() {
   const [wishes, setWishes] = useState<Wish[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [mobileWidth, setMobileWidth] = useState(360) // Дефолтная ширина для SSR
 
   useEffect(() => {
     if (invitationId) {
@@ -29,6 +30,16 @@ export default function InvitationViewPage() {
       loadWishes()
     }
   }, [invitationId])
+
+  // Получаем ширину экрана для мобильной версии
+  useEffect(() => {
+    const updateWidth = () => {
+      setMobileWidth(window.innerWidth)
+    }
+    updateWidth()
+    window.addEventListener('resize', updateWidth)
+    return () => window.removeEventListener('resize', updateWidth)
+  }, [])
 
   const loadInvitation = async () => {
     try {
@@ -227,7 +238,7 @@ export default function InvitationViewPage() {
         {/* Desktop View */}
         <div className="hidden md:block">
           <div
-            className="relative mx-auto bg-white shadow-lg rounded-lg overflow-hidden"
+            className="relative mx-auto shadow-lg rounded-lg overflow-hidden"
             style={{
               width: '800px',
               minHeight: '600px',
@@ -405,11 +416,19 @@ export default function InvitationViewPage() {
                     return null
                   }
                   
-                  // Используем размеры из блока (на мобильных адаптируем)
+                  // Используем размеры из блока с сохранением пропорций
                   const isStoryBlock = block.type === 'story'
-                  const blockHeight = block.size?.height || 150
-                  const mobileHeight = isStoryBlock ? 'auto' : `${Math.max(blockHeight * 0.8, 120)}px`
-                  const minHeight = isStoryBlock ? `${Math.max(blockHeight * 0.8, 120)}px` : undefined
+                  const originalWidth = block.size?.width || 760
+                  const originalHeight = block.size?.height || 200
+                  
+                  // Вычисляем пропорциональную высоту на основе ширины экрана
+                  // Ширина блока на мобильной версии = ширина экрана - отступы (16px)
+                  const blockMobileWidth = mobileWidth - 16
+                  const aspectRatio = originalHeight / originalWidth
+                  const proportionalHeight = blockMobileWidth * aspectRatio
+                  
+                  const mobileHeight = isStoryBlock ? 'auto' : `${Math.max(proportionalHeight, 100)}px`
+                  const minHeight = isStoryBlock ? `${Math.max(proportionalHeight, 100)}px` : undefined
                   
                   return (
                     <div
