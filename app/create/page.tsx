@@ -13,7 +13,7 @@ import PhoneMockup from '../components/iPhoneMockup'
 import { LogOut, Save, Eye, Plus, Smartphone, Settings, ChevronDown, FileText, Trash2, Share2, Check } from 'lucide-react'
 
 export default function ConstructorPage() {
-  const { user, signOut } = useAuth()
+  const { user, signOut, loading: authLoading } = useAuth()
   const router = useRouter()
   const [invitations, setInvitations] = useState<Invitation[]>([])
   const [currentInvitation, setCurrentInvitation] = useState<Invitation | null>(null)
@@ -74,28 +74,30 @@ export default function ConstructorPage() {
       })
     } catch (error) {
       console.error('Error loading invitations:', error)
-      alert(`Ошибка: ${error}`)
+      alert(`Ошибка: ${error instanceof Error ? error.message : String(error)}`)
     } finally {
       setLoading(false)
     }
   }, [user])
 
-  // Защита: редирект если user == null
+  // Защита: редирект если user == null (после завершения загрузки auth)
   useEffect(() => {
-    if (user === null) {
+    if (!authLoading && user === null) {
       router.push('/')
       return
     }
-  }, [user, router])
+  }, [user, authLoading, router])
 
-  // Загрузка приглашений только если user существует
+  // Загрузка приглашений только если user существует и auth загружен
   useEffect(() => {
-    if (user) {
-      loadInvitations()
-    } else {
-      setLoading(false)
+    if (!authLoading) {
+      if (user) {
+        loadInvitations()
+      } else {
+        setLoading(false)
+      }
     }
-  }, [user, loadInvitations])
+  }, [user, authLoading, loadInvitations])
 
   // Закрытие dropdown при клике вне его
   useEffect(() => {
@@ -374,8 +376,8 @@ export default function ConstructorPage() {
     }
   }
 
-  // Защита: не рендерим контент если user == null
-  if (!user || loading) {
+  // Защита: не рендерим контент если auth загружается или user == null или загружаются приглашения
+  if (authLoading || !user || loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
