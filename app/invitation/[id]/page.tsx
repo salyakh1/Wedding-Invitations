@@ -223,7 +223,7 @@ export default function InvitationViewPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen">
       {/* Header - только для десктопа */}
       <header className="hidden md:block bg-white shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-6">
@@ -234,7 +234,7 @@ export default function InvitationViewPage() {
       </header>
 
       {/* Invitation Content */}
-      <div className="max-w-4xl mx-auto md:p-4">
+      <div className="max-w-4xl mx-auto md:p-4" style={{ backgroundColor: 'transparent' }}>
         {/* Desktop View */}
         <div className="hidden md:block">
           <div
@@ -378,7 +378,8 @@ export default function InvitationViewPage() {
             className="relative w-full min-h-screen"
             style={{
               fontFamily: invitation.fontFamily,
-              fontSize: `${Math.max(14, invitation.fontSize * 0.8)}px`
+              fontSize: `${Math.max(14, invitation.fontSize * 0.8)}px`,
+              backgroundColor: 'transparent'
             }}
           >
             {/* Background Music Player */}
