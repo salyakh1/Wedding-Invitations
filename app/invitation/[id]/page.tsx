@@ -311,7 +311,9 @@ export default function InvitationViewPage() {
                   const prevHeight = prevBlock.type === 'story' 
                     ? (prevBlock.size?.height || 200) + 30
                     : (prevBlock.size?.height || 200)
-                  y += prevHeight + blockSpacing
+                  // Используем индивидуальный отступ блока или значение по умолчанию
+                  const prevMarginBottom = prevBlock.marginBottom ?? blockSpacing
+                  y += prevHeight + prevMarginBottom
                 }
                 
                 // Используем размеры из блока
@@ -419,26 +421,40 @@ export default function InvitationViewPage() {
                   
                   // Используем размеры из блока с сохранением пропорций
                   const isStoryBlock = block.type === 'story'
-                  const originalWidth = block.size?.width || 760
-                  const originalHeight = block.size?.height || 200
+                  const needsFixedHeight = block.type === 'video' || block.type === 'map' || block.type === 'countdown'
                   
-                  // Вычисляем пропорциональную высоту на основе ширины экрана
-                  // Ширина блока на мобильной версии = ширина экрана - отступы (16px)
-                  const blockMobileWidth = mobileWidth - 16
-                  const aspectRatio = originalHeight / originalWidth
-                  const proportionalHeight = blockMobileWidth * aspectRatio
+                  // Для большинства блоков используем auto высоту, чтобы содержимое не обрезалось
+                  // Для видео, карты и обратного отсчета - пропорциональная высота
+                  let mobileHeight = 'auto'
+                  let minHeight = '120px'
                   
-                  const mobileHeight = isStoryBlock ? 'auto' : `${Math.max(proportionalHeight, 100)}px`
-                  const minHeight = isStoryBlock ? `${Math.max(proportionalHeight, 100)}px` : undefined
+                  if (needsFixedHeight) {
+                    const originalWidth = block.size?.width || 760
+                    const originalHeight = block.size?.height || 200
+                    const blockMobileWidth = mobileWidth - 16
+                    const aspectRatio = originalHeight / originalWidth
+                    const proportionalHeight = blockMobileWidth * aspectRatio
+                    mobileHeight = `${Math.max(proportionalHeight, 120)}px`
+                    minHeight = `${Math.max(proportionalHeight, 120)}px`
+                  } else if (isStoryBlock) {
+                    // Story блок всегда auto
+                    mobileHeight = 'auto'
+                    minHeight = '150px'
+                  } else {
+                    // Для текстовых блоков используем минимальную высоту, но позволяем расширяться
+                    const originalHeight = block.size?.height || 200
+                    minHeight = `${Math.max(originalHeight * 0.6, 100)}px`
+                  }
                   
                   return (
                     <div
                       key={block.id}
-                      className="relative mx-2 mb-4"
+                      className="relative mx-2"
                       style={{
                         width: 'calc(100% - 16px)',
                         height: mobileHeight,
                         minHeight: minHeight,
+                        marginBottom: `${block.marginBottom ?? 24}px`,
                         zIndex: 10
                       }}
                     >

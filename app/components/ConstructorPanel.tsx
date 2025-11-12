@@ -52,7 +52,9 @@ export default function ConstructorPanel({ invitation, onUpdateInvitation }: Con
       const prevHeight = prevBlock.type === 'story' 
         ? (prevBlock.size?.height || 200) + 30  // Story блоки могут расширяться
         : (prevBlock.size?.height || 200)
-      y += prevHeight + blockSpacing
+      // Используем индивидуальный отступ блока или значение по умолчанию
+      const prevMarginBottom = prevBlock.marginBottom ?? blockSpacing
+      y += prevHeight + prevMarginBottom
     }
     
     const newBlock: InvitationBlock = {
@@ -61,7 +63,8 @@ export default function ConstructorPanel({ invitation, onUpdateInvitation }: Con
       position: { x: 20, y: y },
       size: { width: 760, height: 200 }, // Ширина с отступами
       data: getDefaultBlockData(type),
-      opacity: 0.9
+      opacity: 0.9,
+      marginBottom: 24 // Отступ по умолчанию
     }
 
     const updatedInvitation = {

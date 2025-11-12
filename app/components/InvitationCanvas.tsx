@@ -232,7 +232,9 @@ export default function InvitationCanvas({ invitation, onUpdateInvitation, selec
                   const prevHeight = prevBlock.type === 'story' 
                     ? (prevBlock.size?.height || 200) + 30  // Story блоки расширяются
                     : (prevBlock.size?.height || 200)
-                  y += prevHeight + blockSpacing
+                  // Используем индивидуальный отступ блока или значение по умолчанию
+                  const prevMarginBottom = prevBlock.marginBottom ?? blockSpacing
+                  y += prevHeight + prevMarginBottom
                 }
                 
                 // Для story блока - высота автоматическая (с учетом content)

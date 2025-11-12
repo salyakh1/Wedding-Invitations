@@ -73,9 +73,9 @@ export default function WishesBlock({ block, isSelected, onUpdate, onMouseDown, 
 
   return (
     <div
-      className={`w-full h-full rounded-xl border-2 ${
+      className={`w-full ${isPreview ? 'min-h-full' : 'h-full'} rounded-xl border-2 ${
         isSelected ? 'border-blue-500 shadow-lg' : 'border-transparent'
-      } relative overflow-hidden`}
+      } relative ${isPreview ? 'overflow-visible' : 'overflow-hidden'}`}
       onMouseDown={!isPreview ? onMouseDown : undefined}
       style={{
         background: `linear-gradient(135deg, rgba(255,255,255,${gradientStart}) 0%, rgba(255,255,255,${gradientEnd}) 100%)`,

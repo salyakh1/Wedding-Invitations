@@ -26,9 +26,9 @@ export default function MapBlock({ block, isSelected, onMouseDown, isPreview = f
 
   return (
     <div
-      className={`w-full h-full rounded-lg border-2 ${
+      className={`w-full ${isPreview ? 'min-h-full' : 'h-full'} rounded-lg border-2 ${
         isSelected ? 'border-blue-500' : 'border-transparent'
-      } relative p-4 overflow-hidden`}
+      } relative p-4 ${isPreview ? 'overflow-visible' : 'overflow-hidden'}`}
       onMouseDown={onMouseDown}
       style={{
         minHeight: '100%',

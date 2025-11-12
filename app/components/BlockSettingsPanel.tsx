@@ -186,6 +186,30 @@ export default function BlockSettingsPanel({
                   </div>
                 </div>
 
+                {/* Отступ снизу */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Отступ снизу: {selectedBlock.marginBottom || 24}px
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="4"
+                    value={selectedBlock.marginBottom ?? 24}
+                    onChange={(e) => {
+                      onUpdateBlock({
+                        marginBottom: parseInt(e.target.value)
+                      })
+                    }}
+                    className="w-full accent-green-500"
+                  />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>0px</span>
+                    <span>100px</span>
+                  </div>
+                </div>
+
                 {/* Специфичные настройки для каждого типа блока */}
                 
                 {/* Text Block */}

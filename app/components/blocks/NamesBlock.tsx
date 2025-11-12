@@ -22,9 +22,9 @@ export default function NamesBlock({ block, isSelected, onMouseDown, invitation,
 
   return (
     <div
-      className={`w-full h-full rounded-xl border-2 ${
+      className={`w-full ${isPreview ? 'min-h-full' : 'h-full'} rounded-xl border-2 ${
         isSelected ? 'border-blue-500 shadow-lg' : 'border-transparent'
-      } relative backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 p-4 flex flex-col items-center justify-center overflow-hidden`}
+      } relative backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 p-4 flex flex-col items-center justify-center ${isPreview ? 'overflow-visible' : 'overflow-hidden'}`}
       onMouseDown={onMouseDown}
       style={{
         background: `linear-gradient(135deg, rgba(255,255,255,${gradientStart}) 0%, rgba(255,255,255,${gradientEnd}) 100%)`,

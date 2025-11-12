@@ -5,6 +5,7 @@ export interface InvitationBlock {
   size: { width: number; height: number }
   data: any
   opacity: number
+  marginBottom?: number // Отступ снизу в пикселях
 }
 
 export interface Invitation {
