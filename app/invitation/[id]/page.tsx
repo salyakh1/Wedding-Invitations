@@ -402,7 +402,7 @@ export default function InvitationViewPage() {
             </div>
 
             {/* Render Blocks - Mobile Optimized with Normal Flow */}
-            <div className="relative w-full pb-8">
+            <div className="relative w-full pb-8" style={{ display: 'flex', flexDirection: 'column' }}>
               {invitation.blocks
                 .filter(b => b.type !== 'background')
                 .sort((a, b) => {
@@ -443,18 +443,26 @@ export default function InvitationViewPage() {
                   } else {
                     // Для текстовых блоков используем минимальную высоту, но позволяем расширяться
                     const originalHeight = block.size?.height || 200
-                    minHeight = `${Math.max(originalHeight * 0.6, 100)}px`
+                    minHeight = `${Math.max(originalHeight * 0.7, 120)}px`
                   }
+                  
+                  // Минимальный отступ для мобильной версии увеличен для предотвращения наложения
+                  const defaultMobileMargin = 32
+                  // Для Story блоков добавляем дополнительный отступ, так как они могут расширяться
+                  const additionalStoryMargin = isStoryBlock ? 16 : 0
+                  const finalMarginBottom = (block.marginBottom ?? defaultMobileMargin) + additionalStoryMargin
                   
                   return (
                     <div
                       key={block.id}
-                      className="relative mx-2"
+                      className="relative mx-2 block"
                       style={{
                         width: 'calc(100% - 16px)',
                         height: mobileHeight,
                         minHeight: minHeight,
-                        marginBottom: `${block.marginBottom ?? 24}px`,
+                        marginBottom: `${finalMarginBottom}px`,
+                        clear: 'both',
+                        display: 'block',
                         zIndex: 10
                       }}
                     >
