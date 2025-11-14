@@ -120,6 +120,17 @@ export default function InvitationViewPage() {
       console.log('Blocks is array:', Array.isArray(data.blocks))
       console.log('Blocks count:', mappedInvitation.blocks?.length || 0)
       console.log('Blocks content:', JSON.stringify(mappedInvitation.blocks, null, 2))
+      console.log('Has animations column:', 'animations' in data)
+      console.log('Has effects column:', 'effects' in data)
+      console.log('Animations value:', data.animations)
+      console.log('Effects value:', data.effects)
+      
+      // Проверяем, что блоки действительно есть
+      if (!data.blocks || (Array.isArray(data.blocks) && data.blocks.length === 0)) {
+        console.warn('⚠️ WARNING: No blocks found in invitation!')
+        console.warn('Invitation ID:', data.id)
+        console.warn('Invitation title:', data.title)
+      }
       
       // Проверяем, что blocks - это массив
       if (!Array.isArray(mappedInvitation.blocks)) {
@@ -155,6 +166,18 @@ export default function InvitationViewPage() {
       
       console.log('Final blocks after processing:', mappedInvitation.blocks)
       console.log('Blocks count after processing:', mappedInvitation.blocks?.length || 0)
+      
+      // КРИТИЧЕСКАЯ ПРОВЕРКА: если блоков нет, выводим предупреждение
+      if (!mappedInvitation.blocks || mappedInvitation.blocks.length === 0) {
+        console.error('❌ КРИТИЧЕСКАЯ ОШИБКА: Блоки не загружены или пусты!')
+        console.error('Invitation ID:', data.id)
+        console.error('Raw blocks from DB:', data.blocks)
+        console.error('Blocks type:', typeof data.blocks)
+        console.error('Blocks is array:', Array.isArray(data.blocks))
+      } else {
+        console.log('✅ Блоки успешно загружены:', mappedInvitation.blocks.length, 'блоков')
+        console.log('Типы блоков:', mappedInvitation.blocks.map((b: any) => b.type))
+      }
       
       setInvitation(mappedInvitation)
     } catch (error) {
@@ -396,15 +419,33 @@ export default function InvitationViewPage() {
             )}
 
             {/* Render Blocks */}
-            {invitation.blocks && Array.isArray(invitation.blocks) && invitation.blocks.length > 0 ? (
-              invitation.blocks
-              .filter(b => b.type !== 'background') // Фон уже применен на главном контейнере
-              .sort((a, b) => {
-                const aY = a.position?.y || 0
-                const bY = b.position?.y || 0
-                return aY - bY
-              })
-              .map((block, index) => {
+            {(() => {
+              const nonBackgroundBlocks = invitation.blocks && Array.isArray(invitation.blocks) 
+                ? invitation.blocks.filter(b => b.type !== 'background')
+                : []
+              
+              console.log('Rendering blocks - total:', invitation.blocks?.length || 0)
+              console.log('Non-background blocks:', nonBackgroundBlocks.length)
+              
+              if (nonBackgroundBlocks.length === 0) {
+                console.warn('⚠️ Нет блоков для отображения (после фильтрации background)')
+                return (
+                  <div className="flex items-center justify-center min-h-[400px]">
+                    <div className="text-center">
+                      <p className="text-gray-500 text-lg">Приглашение пока пустое</p>
+                      <p className="text-gray-400 text-sm mt-2">Добавьте блоки в конструкторе</p>
+                    </div>
+                  </div>
+                )
+              }
+              
+              return nonBackgroundBlocks
+                .sort((a, b) => {
+                  const aY = a.position?.y || 0
+                  const bY = b.position?.y || 0
+                  return aY - bY
+                })
+                .map((block, index) => {
 
                 if (
                   block.type === 'story' &&
@@ -468,14 +509,7 @@ export default function InvitationViewPage() {
                   </AnimatedBlock>
                 )
               })
-            ) : (
-              <div className="flex items-center justify-center min-h-[400px]">
-                <div className="text-center">
-                  <p className="text-gray-500 text-lg">Приглашение пока пустое</p>
-                  <p className="text-gray-400 text-sm mt-2">Добавьте блоки в конструкторе</p>
-                </div>
-              </div>
-            )}
+            })()}
           </div>
         </div>
 
