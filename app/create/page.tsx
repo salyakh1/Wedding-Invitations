@@ -51,19 +51,21 @@ export default function ConstructorPage() {
       
       console.log('Loaded invitations:', data)
       
-      // Маппим данные из snake_case в camelCase
-      const mappedInvitations = (data || []).map((invitation: any) => ({
-        id: invitation.id,
-        title: invitation.title,
-        backgroundImage: invitation.background_image,
-        backgroundColor: invitation.background_color,
-        backgroundMusic: invitation.background_music,
-        fontFamily: invitation.font_family,
-        fontSize: invitation.font_size,
-        blocks: invitation.blocks || [],
-        createdAt: invitation.created_at,
-        updatedAt: invitation.updated_at
-      }))
+          // Маппим данные из snake_case в camelCase
+          const mappedInvitations = (data || []).map((invitation: any) => ({
+            id: invitation.id,
+            title: invitation.title,
+            backgroundImage: invitation.background_image,
+            backgroundColor: invitation.background_color,
+            backgroundMusic: invitation.background_music,
+            fontFamily: invitation.font_family,
+            fontSize: invitation.font_size,
+            blocks: invitation.blocks || [],
+            animations: invitation.animations || undefined,
+            effects: invitation.effects || undefined,
+            createdAt: invitation.created_at,
+            updatedAt: invitation.updated_at
+          }))
       
       setInvitations(mappedInvitations)
       
@@ -205,7 +207,9 @@ export default function ConstructorPage() {
           background_music: currentInvitation.backgroundMusic,
           font_family: currentInvitation.fontFamily,
           font_size: currentInvitation.fontSize,
-          blocks: currentInvitation.blocks || []
+          blocks: currentInvitation.blocks || [],
+          animations: currentInvitation.animations || null,
+          effects: currentInvitation.effects || null
         })
         .eq('id', currentInvitation.id)
         .select()

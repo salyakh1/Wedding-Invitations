@@ -14,6 +14,8 @@ import WishesBlock from '../../components/blocks/WishesBlock'
 import WishesSliderBlock from '../../components/blocks/WishesSliderBlock'
 import CountdownBlock from '../../components/blocks/CountdownBlock'
 import WeddingDateBlock from '../../components/blocks/WeddingDateBlock'
+import AnimatedBlock from '../../components/AnimatedBlock'
+import ParticleEffects from '../../components/ParticleEffects'
 
 export default function InvitationViewPage() {
   const params = useParams()
@@ -23,6 +25,7 @@ export default function InvitationViewPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [mobileWidth, setMobileWidth] = useState(360) // Дефолтная ширина для SSR
+  const [scrollY, setScrollY] = useState(0)
 
   useEffect(() => {
     if (invitationId) {
@@ -30,6 +33,15 @@ export default function InvitationViewPage() {
       loadWishes()
     }
   }, [invitationId])
+
+  // Отслеживание прокрутки для эффектов
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   // Получаем ширину экрана для мобильной версии
   useEffect(() => {
@@ -71,6 +83,8 @@ export default function InvitationViewPage() {
         fontFamily: data.font_family,
         fontSize: data.font_size,
         blocks: data.blocks || [],
+        animations: data.animations || undefined,
+        effects: data.effects || undefined,
         createdAt: data.created_at,
         updatedAt: data.updated_at
       }
@@ -222,8 +236,16 @@ export default function InvitationViewPage() {
     )
   }
 
+  // Вычисляем эффекты для фона
+  const parallaxOffset = invitation.effects?.parallax ? scrollY * 0.5 : 0
+  const blurAmount = invitation.effects?.blurOnScroll ? Math.min(scrollY / 20, 10) : 0
+  const gradientRotation = invitation.effects?.gradientAnimation ? (scrollY / 10) % 360 : 0
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative">
+      {/* Particle Effects */}
+      {invitation.effects?.particles && <ParticleEffects enabled={true} />}
+
       {/* Header - только для десктопа */}
       <header className="hidden md:block bg-white shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-6">
@@ -248,8 +270,12 @@ export default function InvitationViewPage() {
               backgroundImage: invitation.backgroundImage ? `url(${invitation.backgroundImage})` : undefined,
               backgroundColor: invitation.backgroundColor,
               backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat'
+              backgroundPosition: invitation.effects?.parallax ? `center ${50 + parallaxOffset}px` : 'center',
+              backgroundRepeat: 'no-repeat',
+              filter: blurAmount > 0 ? `blur(${blurAmount}px)` : undefined,
+              background: invitation.effects?.gradientAnimation && invitation.backgroundColor
+                ? `linear-gradient(${gradientRotation}deg, ${invitation.backgroundColor} 0%, ${invitation.backgroundColor}dd 50%, ${invitation.backgroundColor} 100%), ${invitation.backgroundImage ? `url(${invitation.backgroundImage})` : ''}`
+                : undefined
             }}
           >
             {/* Background Music Player */}
@@ -323,22 +349,28 @@ export default function InvitationViewPage() {
                 const currentHeight = isStoryBlock ? 'auto' : `${blockHeight}px`
                 const minHeight = isStoryBlock ? `${blockHeight}px` : undefined
                 
+                const animatedBlockIndex = nonBackgroundBlocks.findIndex(b => b.id === block.id)
                 return (
-                  <div
+                  <AnimatedBlock
                     key={block.id}
-                    className="absolute"
-                    style={{
-                      left: '20px',
-                      top: `${y}px`,
-                      width: `${blockWidth}px`,
-                      height: currentHeight,
-                      minHeight: minHeight,
-                      zIndex: 10,
-                      pointerEvents: 'auto'
-                    }}
+                    index={animatedBlockIndex}
+                    animations={invitation.animations}
                   >
-                    {renderBlock(block)}
-                  </div>
+                    <div
+                      className="absolute"
+                      style={{
+                        left: '20px',
+                        top: `${y}px`,
+                        width: `${blockWidth}px`,
+                        height: currentHeight,
+                        minHeight: minHeight,
+                        zIndex: 10,
+                        pointerEvents: 'auto'
+                      }}
+                    >
+                      {renderBlock(block)}
+                    </div>
+                  </AnimatedBlock>
                 )
               })}
           </div>
@@ -353,8 +385,12 @@ export default function InvitationViewPage() {
               backgroundImage: invitation.backgroundImage ? `url(${invitation.backgroundImage})` : undefined,
               backgroundColor: invitation.backgroundColor,
               backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat'
+              backgroundPosition: invitation.effects?.parallax ? `center ${50 + parallaxOffset}px` : 'center',
+              backgroundRepeat: 'no-repeat',
+              filter: blurAmount > 0 ? `blur(${blurAmount}px)` : undefined,
+              background: invitation.effects?.gradientAnimation && invitation.backgroundColor
+                ? `linear-gradient(${gradientRotation}deg, ${invitation.backgroundColor} 0%, ${invitation.backgroundColor}dd 50%, ${invitation.backgroundColor} 100%), ${invitation.backgroundImage ? `url(${invitation.backgroundImage})` : ''}`
+                : undefined
             }}
           />
           
@@ -452,22 +488,36 @@ export default function InvitationViewPage() {
                   const additionalStoryMargin = isStoryBlock ? 16 : 0
                   const finalMarginBottom = (block.marginBottom ?? defaultMobileMargin) + additionalStoryMargin
                   
+                  const blockIndex = invitation.blocks
+                    .filter(b => b.type !== 'background')
+                    .sort((a, b) => {
+                      const aY = a.position?.y || 0
+                      const bY = b.position?.y || 0
+                      return aY - bY
+                    })
+                    .findIndex(b => b.id === block.id)
+
                   return (
-                    <div
+                    <AnimatedBlock
                       key={block.id}
-                      className="relative mx-2 block"
-                      style={{
-                        width: 'calc(100% - 16px)',
-                        height: mobileHeight,
-                        minHeight: minHeight,
-                        marginBottom: `${finalMarginBottom}px`,
-                        clear: 'both',
-                        display: 'block',
-                        zIndex: 10
-                      }}
+                      index={blockIndex}
+                      animations={invitation.animations}
                     >
-                      {renderBlock(block)}
-                    </div>
+                      <div
+                        className="relative mx-2 block"
+                        style={{
+                          width: 'calc(100% - 16px)',
+                          height: mobileHeight,
+                          minHeight: minHeight,
+                          marginBottom: `${finalMarginBottom}px`,
+                          clear: 'both',
+                          display: 'block',
+                          zIndex: 10
+                        }}
+                      >
+                        {renderBlock(block)}
+                      </div>
+                    </AnimatedBlock>
                   )
                 })}
             </div>

@@ -20,6 +20,19 @@ export interface Invitation {
   blocks: InvitationBlock[]
   createdAt: string
   updatedAt: string
+  // Настройки анимаций и эффектов
+  animations?: {
+    fadeIn?: boolean
+    slideUp?: boolean
+    scaleIn?: boolean
+    staggered?: boolean
+  }
+  effects?: {
+    parallax?: boolean
+    particles?: boolean
+    gradientAnimation?: boolean
+    blurOnScroll?: boolean
+  }
 }
 
 export interface Wish {

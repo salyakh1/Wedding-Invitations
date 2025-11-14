@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Invitation } from '../../types'
-import { Upload, Music, Palette, Type, Eye, Settings } from 'lucide-react'
+import { Upload, Music, Palette, Type, Eye, Settings, Sparkles } from 'lucide-react'
 import TextSettingsPanel from './TextSettingsPanel'
 
 interface SettingsPanelProps {
@@ -25,7 +25,7 @@ const backgroundColors = [
 ]
 
 export default function SettingsPanel({ invitation, onUpdateInvitation }: SettingsPanelProps) {
-  const [activeTab, setActiveTab] = useState<'general' | 'appearance' | 'media' | 'text'>('general')
+  const [activeTab, setActiveTab] = useState<'general' | 'appearance' | 'media' | 'text' | 'animations'>('general')
 
   const updateInvitation = (updates: Partial<Invitation>) => {
     if (!invitation) return
@@ -107,6 +107,19 @@ export default function SettingsPanel({ invitation, onUpdateInvitation }: Settin
           }`}
         >
           Текст
+        </button>
+        <button
+          onClick={() => setActiveTab('animations')}
+          className={`flex-1 py-2 px-3 text-sm font-medium rounded-md transition-colors ${
+            activeTab === 'animations' 
+              ? 'bg-white text-gray-900 shadow-sm' 
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          <div className="flex items-center justify-center space-x-1">
+            <Sparkles className="w-4 h-4" />
+            <span>Эффекты</span>
+          </div>
         </button>
       </div>
 
@@ -288,6 +301,143 @@ export default function SettingsPanel({ invitation, onUpdateInvitation }: Settin
           invitation={invitation} 
           onUpdateInvitation={onUpdateInvitation} 
         />
+      )}
+
+      {/* Animations & Effects Settings */}
+      {activeTab === 'animations' && (
+        <div className="space-y-6">
+          {/* Анимации блоков */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-800 mb-3 flex items-center space-x-2">
+              <Sparkles className="w-4 h-4 text-pink-500" />
+              <span>Анимации появления блоков</span>
+            </h3>
+            <div className="space-y-3 bg-gray-50 rounded-lg p-4">
+              <label className="flex items-center justify-between cursor-pointer">
+                <span className="text-sm text-gray-700">Fade-in (Плавное появление)</span>
+                <input
+                  type="checkbox"
+                  checked={invitation.animations?.fadeIn ?? false}
+                  onChange={(e) => updateInvitation({
+                    animations: {
+                      ...invitation.animations,
+                      fadeIn: e.target.checked
+                    }
+                  })}
+                  className="w-5 h-5 text-pink-500 rounded focus:ring-pink-500"
+                />
+              </label>
+              <label className="flex items-center justify-between cursor-pointer">
+                <span className="text-sm text-gray-700">Slide-up (Снизу вверх)</span>
+                <input
+                  type="checkbox"
+                  checked={invitation.animations?.slideUp ?? false}
+                  onChange={(e) => updateInvitation({
+                    animations: {
+                      ...invitation.animations,
+                      slideUp: e.target.checked
+                    }
+                  })}
+                  className="w-5 h-5 text-pink-500 rounded focus:ring-pink-500"
+                />
+              </label>
+              <label className="flex items-center justify-between cursor-pointer">
+                <span className="text-sm text-gray-700">Scale-in (С увеличением)</span>
+                <input
+                  type="checkbox"
+                  checked={invitation.animations?.scaleIn ?? false}
+                  onChange={(e) => updateInvitation({
+                    animations: {
+                      ...invitation.animations,
+                      scaleIn: e.target.checked
+                    }
+                  })}
+                  className="w-5 h-5 text-pink-500 rounded focus:ring-pink-500"
+                />
+              </label>
+              <label className="flex items-center justify-between cursor-pointer">
+                <span className="text-sm text-gray-700">Staggered (По очереди с задержкой)</span>
+                <input
+                  type="checkbox"
+                  checked={invitation.animations?.staggered ?? false}
+                  onChange={(e) => updateInvitation({
+                    animations: {
+                      ...invitation.animations,
+                      staggered: e.target.checked
+                    }
+                  })}
+                  className="w-5 h-5 text-pink-500 rounded focus:ring-pink-500"
+                />
+              </label>
+            </div>
+          </div>
+
+          {/* Спецэффекты */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-800 mb-3 flex items-center space-x-2">
+              <Sparkles className="w-4 h-4 text-purple-500" />
+              <span>Спецэффекты для фона</span>
+            </h3>
+            <div className="space-y-3 bg-gray-50 rounded-lg p-4">
+              <label className="flex items-center justify-between cursor-pointer">
+                <span className="text-sm text-gray-700">Parallax scrolling (Параллакс)</span>
+                <input
+                  type="checkbox"
+                  checked={invitation.effects?.parallax ?? false}
+                  onChange={(e) => updateInvitation({
+                    effects: {
+                      ...invitation.effects,
+                      parallax: e.target.checked
+                    }
+                  })}
+                  className="w-5 h-5 text-pink-500 rounded focus:ring-pink-500"
+                />
+              </label>
+              <label className="flex items-center justify-between cursor-pointer">
+                <span className="text-sm text-gray-700">Particle effects (Частицы: конфетти, звезды, сердечки)</span>
+                <input
+                  type="checkbox"
+                  checked={invitation.effects?.particles ?? false}
+                  onChange={(e) => updateInvitation({
+                    effects: {
+                      ...invitation.effects,
+                      particles: e.target.checked
+                    }
+                  })}
+                  className="w-5 h-5 text-pink-500 rounded focus:ring-pink-500"
+                />
+              </label>
+              <label className="flex items-center justify-between cursor-pointer">
+                <span className="text-sm text-gray-700">Gradient animation (Анимация градиента)</span>
+                <input
+                  type="checkbox"
+                  checked={invitation.effects?.gradientAnimation ?? false}
+                  onChange={(e) => updateInvitation({
+                    effects: {
+                      ...invitation.effects,
+                      gradientAnimation: e.target.checked
+                    }
+                  })}
+                  className="w-5 h-5 text-pink-500 rounded focus:ring-pink-500"
+                />
+              </label>
+              <label className="flex items-center justify-between cursor-pointer">
+                <span className="text-sm text-gray-700">Blur on scroll (Размытие при прокрутке)</span>
+                <input
+                  type="checkbox"
+                  checked={invitation.effects?.blurOnScroll ?? false}
+                  onChange={(e) => updateInvitation({
+                    effects: {
+                      ...invitation.effects,
+                      blurOnScroll: e.target.checked
+                    }
+                  })}
+                  className="w-5 h-5 text-pink-500 rounded focus:ring-pink-500"
+                />
+              </label>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
