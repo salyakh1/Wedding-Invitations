@@ -60,8 +60,19 @@ export default function InvitationViewPage() {
 
   // Если анимация роз не включена, сразу показываем приглашение
   useEffect(() => {
-    if (invitation && !invitation.effects?.roseOpeningAnimation) {
-      setShowInvitation(true)
+    if (invitation) {
+      if (!invitation.effects?.roseOpeningAnimation) {
+        setShowInvitation(true)
+      }
+      // Логируем для отладки
+      console.log('Invitation loaded:', {
+        id: invitation.id,
+        title: invitation.title,
+        blocksCount: invitation.blocks?.length || 0,
+        blocks: invitation.blocks,
+        hasRoseAnimation: invitation.effects?.roseOpeningAnimation,
+        showInvitation: !invitation.effects?.roseOpeningAnimation
+      })
     }
   }, [invitation])
 
@@ -113,8 +124,37 @@ export default function InvitationViewPage() {
       // Проверяем, что blocks - это массив
       if (!Array.isArray(mappedInvitation.blocks)) {
         console.error('ERROR: blocks is not an array!', mappedInvitation.blocks)
-        mappedInvitation.blocks = []
+        // Если blocks это строка JSON, пытаемся распарсить
+        if (typeof mappedInvitation.blocks === 'string') {
+          try {
+            mappedInvitation.blocks = JSON.parse(mappedInvitation.blocks)
+          } catch (e) {
+            console.error('Failed to parse blocks JSON:', e)
+            mappedInvitation.blocks = []
+          }
+        } else {
+          mappedInvitation.blocks = []
+        }
       }
+      
+      // Убеждаемся, что все блоки имеют правильную структуру
+      if (Array.isArray(mappedInvitation.blocks)) {
+        mappedInvitation.blocks = mappedInvitation.blocks.map((block: any) => {
+          // Если блок это строка, пытаемся распарсить
+          if (typeof block === 'string') {
+            try {
+              block = JSON.parse(block)
+            } catch (e) {
+              console.error('Failed to parse block JSON:', e)
+              return null
+            }
+          }
+          return block
+        }).filter((block: any) => block !== null)
+      }
+      
+      console.log('Final blocks after processing:', mappedInvitation.blocks)
+      console.log('Blocks count after processing:', mappedInvitation.blocks?.length || 0)
       
       setInvitation(mappedInvitation)
     } catch (error) {
@@ -356,7 +396,8 @@ export default function InvitationViewPage() {
             )}
 
             {/* Render Blocks */}
-            {invitation.blocks
+            {invitation.blocks && Array.isArray(invitation.blocks) && invitation.blocks.length > 0 ? (
+              invitation.blocks
               .filter(b => b.type !== 'background') // Фон уже применен на главном контейнере
               .sort((a, b) => {
                 const aY = a.position?.y || 0
@@ -426,7 +467,15 @@ export default function InvitationViewPage() {
                     </div>
                   </AnimatedBlock>
                 )
-              })}
+              })
+            ) : (
+              <div className="flex items-center justify-center min-h-[400px]">
+                <div className="text-center">
+                  <p className="text-gray-500 text-lg">Приглашение пока пустое</p>
+                  <p className="text-gray-400 text-sm mt-2">Добавьте блоки в конструкторе</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -462,7 +511,8 @@ export default function InvitationViewPage() {
 
             {/* Render Blocks - Mobile Optimized with Normal Flow */}
             <div className="relative w-full pb-8" style={{ display: 'flex', flexDirection: 'column' }}>
-              {invitation.blocks
+              {invitation.blocks && Array.isArray(invitation.blocks) && invitation.blocks.length > 0 ? (
+                invitation.blocks
                 .filter(b => b.type !== 'background')
                 .sort((a, b) => {
                   const aY = a.position?.y || 0
@@ -542,7 +592,15 @@ export default function InvitationViewPage() {
                       </div>
                     </AnimatedBlock>
                   )
-                })}
+                })
+              ) : (
+                <div className="flex items-center justify-center min-h-[400px] px-4">
+                  <div className="text-center">
+                    <p className="text-gray-500 text-lg">Приглашение пока пустое</p>
+                    <p className="text-gray-400 text-sm mt-2">Добавьте блоки в конструкторе</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
