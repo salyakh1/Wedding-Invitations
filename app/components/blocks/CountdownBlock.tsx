@@ -11,9 +11,10 @@ interface CountdownBlockProps {
   onMouseDown: (e: React.MouseEvent) => void
   isPreview?: boolean
   showEditButtons?: boolean
+  invitation?: any // Настройки текста из приглашения
 }
 
-export default function CountdownBlock({ block, isSelected, onMouseDown, isPreview = false }: CountdownBlockProps) {
+export default function CountdownBlock({ block, isSelected, onMouseDown, isPreview = false, invitation }: CountdownBlockProps) {
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -83,7 +84,14 @@ export default function CountdownBlock({ block, isSelected, onMouseDown, isPrevi
         <div className="text-center">
             {block.data.weddingDate ? (
               <div className="space-y-4">
-                <h3 className="text-lg font-bold text-gray-800 drop-shadow-sm">
+                <h3 
+                  className="text-lg font-bold drop-shadow-sm"
+                  style={{
+                    fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                    fontSize: `${(block.fontSize || invitation?.fontSize || 16) * 1.1}px`,
+                    color: block.textColor || invitation?.textColor || '#2D3748'
+                  }}
+                >
                   {block.data.title || 'До свадьбы осталось'}
                 </h3>
                 
@@ -105,10 +113,24 @@ export default function CountdownBlock({ block, isSelected, onMouseDown, isPrevi
                         WebkitBackdropFilter: 'blur(12px)'
                       }}
                     >
-                      <div className="text-2xl font-bold text-gray-800 drop-shadow-sm">
+                      <div 
+                        className="text-2xl font-bold drop-shadow-sm"
+                        style={{
+                          fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                          fontSize: `${(block.fontSize || invitation?.fontSize || 16) * 1.5}px`,
+                          color: block.textColor || invitation?.textColor || '#2D3748'
+                        }}
+                      >
                         {timeLeft.days}
                       </div>
-                      <div className="text-xs text-gray-600 drop-shadow-sm">
+                      <div 
+                        className="text-xs drop-shadow-sm"
+                        style={{
+                          fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                          fontSize: `${(block.fontSize || invitation?.fontSize || 16) * 0.75}px`,
+                          color: block.textColor || invitation?.textColor || '#718096'
+                        }}
+                      >
                         {timeLeft.days === 1 ? 'день' : timeLeft.days < 5 ? 'дня' : 'дней'}
                       </div>
                     </div>
@@ -121,10 +143,24 @@ export default function CountdownBlock({ block, isSelected, onMouseDown, isPrevi
                         WebkitBackdropFilter: 'blur(12px)'
                       }}
                     >
-                      <div className="text-2xl font-bold text-gray-800 drop-shadow-sm">
+                      <div 
+                        className="text-2xl font-bold drop-shadow-sm"
+                        style={{
+                          fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                          fontSize: `${(block.fontSize || invitation?.fontSize || 16) * 1.5}px`,
+                          color: block.textColor || invitation?.textColor || '#2D3748'
+                        }}
+                      >
                         {timeLeft.hours}
                       </div>
-                      <div className="text-xs text-gray-600 drop-shadow-sm">
+                      <div 
+                        className="text-xs drop-shadow-sm"
+                        style={{
+                          fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                          fontSize: `${(block.fontSize || invitation?.fontSize || 16) * 0.75}px`,
+                          color: block.textColor || invitation?.textColor || '#718096'
+                        }}
+                      >
                         {timeLeft.hours === 1 ? 'час' : timeLeft.hours < 5 ? 'часа' : 'часов'}
                       </div>
                     </div>
@@ -137,10 +173,24 @@ export default function CountdownBlock({ block, isSelected, onMouseDown, isPrevi
                         WebkitBackdropFilter: 'blur(12px)'
                       }}
                     >
-                      <div className="text-2xl font-bold text-gray-800 drop-shadow-sm">
+                      <div 
+                        className="text-2xl font-bold drop-shadow-sm"
+                        style={{
+                          fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                          fontSize: `${(block.fontSize || invitation?.fontSize || 16) * 1.5}px`,
+                          color: block.textColor || invitation?.textColor || '#2D3748'
+                        }}
+                      >
                         {timeLeft.minutes}
                       </div>
-                      <div className="text-xs text-gray-600 drop-shadow-sm">
+                      <div 
+                        className="text-xs drop-shadow-sm"
+                        style={{
+                          fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                          fontSize: `${(block.fontSize || invitation?.fontSize || 16) * 0.75}px`,
+                          color: block.textColor || invitation?.textColor || '#718096'
+                        }}
+                      >
                         {timeLeft.minutes === 1 ? 'минута' : timeLeft.minutes < 5 ? 'минуты' : 'минут'}
                       </div>
                     </div>
@@ -153,10 +203,24 @@ export default function CountdownBlock({ block, isSelected, onMouseDown, isPrevi
                         WebkitBackdropFilter: 'blur(12px)'
                       }}
                     >
-                      <div className="text-2xl font-bold text-gray-800 drop-shadow-sm">
+                      <div 
+                        className="text-2xl font-bold drop-shadow-sm"
+                        style={{
+                          fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                          fontSize: `${(block.fontSize || invitation?.fontSize || 16) * 1.5}px`,
+                          color: block.textColor || invitation?.textColor || '#2D3748'
+                        }}
+                      >
                         {timeLeft.seconds}
                       </div>
-                      <div className="text-xs text-gray-600 drop-shadow-sm">
+                      <div 
+                        className="text-xs drop-shadow-sm"
+                        style={{
+                          fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                          fontSize: `${(block.fontSize || invitation?.fontSize || 16) * 0.75}px`,
+                          color: block.textColor || invitation?.textColor || '#718096'
+                        }}
+                      >
                         {timeLeft.seconds === 1 ? 'секунда' : timeLeft.seconds < 5 ? 'секунды' : 'секунд'}
                       </div>
                     </div>
@@ -164,7 +228,14 @@ export default function CountdownBlock({ block, isSelected, onMouseDown, isPrevi
                 )}
                 
                 {block.data.description && (
-                  <p className="text-sm text-gray-600 drop-shadow-sm mt-3">
+                  <p 
+                    className="text-sm drop-shadow-sm mt-3"
+                    style={{
+                      fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                      fontSize: `${block.fontSize || invitation?.fontSize || 16}px`,
+                      color: block.textColor || invitation?.textColor || '#718096'
+                    }}
+                  >
                     {block.data.description}
                   </p>
                 )}

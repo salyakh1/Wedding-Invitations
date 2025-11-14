@@ -19,6 +19,8 @@ export default function AnimatedBlock({ children, index, animations }: AnimatedB
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    if (typeof window === 'undefined' || !ref.current) return
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {

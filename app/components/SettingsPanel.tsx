@@ -408,6 +408,20 @@ export default function SettingsPanel({ invitation, onUpdateInvitation }: Settin
                 />
               </label>
               <label className="flex items-center justify-between cursor-pointer">
+                <span className="text-sm text-gray-700">Romantic particles (Романтичные частицы: лепестки роз, сердечки, блестки)</span>
+                <input
+                  type="checkbox"
+                  checked={invitation.effects?.romanticParticles ?? false}
+                  onChange={(e) => updateInvitation({
+                    effects: {
+                      ...invitation.effects,
+                      romanticParticles: e.target.checked
+                    }
+                  })}
+                  className="w-5 h-5 text-pink-500 rounded focus:ring-pink-500"
+                />
+              </label>
+              <label className="flex items-center justify-between cursor-pointer">
                 <span className="text-sm text-gray-700">Gradient animation (Анимация градиента)</span>
                 <input
                   type="checkbox"
@@ -435,6 +449,33 @@ export default function SettingsPanel({ invitation, onUpdateInvitation }: Settin
                   className="w-5 h-5 text-pink-500 rounded focus:ring-pink-500"
                 />
               </label>
+            </div>
+          </div>
+
+          {/* Анимация открытия */}
+          <div>
+            <h3 className="text-sm font-semibold text-gray-800 mb-3 flex items-center space-x-2">
+              <Sparkles className="w-4 h-4 text-rose-500" />
+              <span>Анимация открытия приглашения</span>
+            </h3>
+            <div className="space-y-3 bg-gray-50 rounded-lg p-4">
+              <label className="flex items-center justify-between cursor-pointer">
+                <span className="text-sm text-gray-700">Анимация распускающихся роз</span>
+                <input
+                  type="checkbox"
+                  checked={invitation.effects?.roseOpeningAnimation ?? false}
+                  onChange={(e) => updateInvitation({
+                    effects: {
+                      ...invitation.effects,
+                      roseOpeningAnimation: e.target.checked
+                    }
+                  })}
+                  className="w-5 h-5 text-pink-500 rounded focus:ring-pink-500"
+                />
+              </label>
+              <p className="text-xs text-gray-500 mt-2">
+                При включении при открытии приглашения будет показываться анимация распускающихся роз
+              </p>
             </div>
           </div>
         </div>

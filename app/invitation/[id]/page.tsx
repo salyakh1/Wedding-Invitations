@@ -14,8 +14,12 @@ import WishesBlock from '../../components/blocks/WishesBlock'
 import WishesSliderBlock from '../../components/blocks/WishesSliderBlock'
 import CountdownBlock from '../../components/blocks/CountdownBlock'
 import WeddingDateBlock from '../../components/blocks/WeddingDateBlock'
+import DressCodeBlock from '../../components/blocks/DressCodeBlock'
+import GuestsBlock from '../../components/blocks/GuestsBlock'
 import AnimatedBlock from '../../components/AnimatedBlock'
 import ParticleEffects from '../../components/ParticleEffects'
+import RomanticParticles from '../../components/RomanticParticles'
+import RoseOpeningAnimation from '../../components/RoseOpeningAnimation'
 
 export default function InvitationViewPage() {
   const params = useParams()
@@ -26,6 +30,7 @@ export default function InvitationViewPage() {
   const [error, setError] = useState<string | null>(null)
   const [mobileWidth, setMobileWidth] = useState(360) // Дефолтная ширина для SSR
   const [scrollY, setScrollY] = useState(0)
+  const [showInvitation, setShowInvitation] = useState(false)
 
   useEffect(() => {
     if (invitationId) {
@@ -52,6 +57,13 @@ export default function InvitationViewPage() {
     window.addEventListener('resize', updateWidth)
     return () => window.removeEventListener('resize', updateWidth)
   }, [])
+
+  // Если анимация роз не включена, сразу показываем приглашение
+  useEffect(() => {
+    if (invitation && !invitation.effects?.roseOpeningAnimation) {
+      setShowInvitation(true)
+    }
+  }, [invitation])
 
   const loadInvitation = async () => {
     try {
@@ -199,6 +211,10 @@ export default function InvitationViewPage() {
         return <CountdownBlock {...commonProps} />
       case 'wedding-date':
         return <WeddingDateBlock {...commonProps} />
+      case 'dress-code':
+        return <DressCodeBlock {...commonProps} />
+      case 'guests':
+        return <GuestsBlock {...commonProps} />
       default:
         console.warn('Unknown block type:', block.type)
         return null
@@ -236,26 +252,85 @@ export default function InvitationViewPage() {
     )
   }
 
-  // Вычисляем эффекты для фона
-  const parallaxOffset = invitation.effects?.parallax ? scrollY * 0.5 : 0
-  const blurAmount = invitation.effects?.blurOnScroll ? Math.min(scrollY / 20, 10) : 0
-  const gradientRotation = invitation.effects?.gradientAnimation ? (scrollY / 10) % 360 : 0
+  // Вычисляем эффекты для фона (с проверкой на null/undefined)
+  const effects = invitation?.effects || {}
+  const animations = invitation?.animations || {}
+  const parallaxOffset = effects.parallax ? scrollY * 0.5 : 0
+  const blurAmount = effects.blurOnScroll ? Math.min(scrollY / 20, 10) : 0
+  const gradientRotation = effects.gradientAnimation ? (scrollY / 10) % 360 : 0
+
+  // Если анимация роз включена и приглашение еще не показано, показываем анимацию
+  const showRoseAnimation = effects.roseOpeningAnimation && !showInvitation
+
+  // Находим блок фона (если есть)
+  const backgroundBlock = invitation?.blocks?.find(b => b.type === 'background')
+  
+  // Определяем фон: приоритет у блока фона, затем настройки приглашения
+  // Проверяем на пустую строку и null/undefined
+  const backgroundImage = (backgroundBlock?.data?.image && backgroundBlock.data.image.trim() !== '') 
+    ? backgroundBlock.data.image 
+    : (invitation?.backgroundImage && invitation.backgroundImage.trim() !== '') 
+      ? invitation.backgroundImage 
+      : undefined
+  const backgroundColor = (backgroundBlock?.data?.color && backgroundBlock.data.color.trim() !== '') 
+    ? backgroundBlock.data.color 
+    : (invitation?.backgroundColor && invitation.backgroundColor.trim() !== '') 
+      ? invitation.backgroundColor 
+      : '#ffffff'
 
   return (
     <div className="min-h-screen relative">
+      {/* Background Layer - Full Screen (Desktop & Mobile) */}
+      <div
+        className="fixed inset-0 -z-20"
+        style={{
+          ...(effects.gradientAnimation && backgroundColor
+            ? {
+                background: `linear-gradient(${gradientRotation}deg, ${backgroundColor} 0%, ${backgroundColor}dd 50%, ${backgroundColor} 100%)${backgroundImage ? `, url(${backgroundImage})` : ''}`,
+                backgroundSize: 'cover',
+                backgroundPosition: effects.parallax ? `center ${50 + parallaxOffset}px` : 'center',
+                backgroundRepeat: 'no-repeat',
+                backgroundAttachment: 'fixed'
+              }
+            : {
+                backgroundImage: backgroundImage ? `url(${backgroundImage})` : undefined,
+                backgroundColor: backgroundColor,
+                backgroundSize: 'cover',
+                backgroundPosition: effects.parallax ? `center ${50 + parallaxOffset}px` : 'center',
+                backgroundRepeat: 'no-repeat',
+                backgroundAttachment: 'fixed'
+              }),
+          filter: blurAmount > 0 ? `blur(${blurAmount}px)` : undefined
+        }}
+      />
+
+      {/* Rose Opening Animation */}
+      {showRoseAnimation && (
+        <RoseOpeningAnimation
+          enabled={true}
+          onComplete={() => setShowInvitation(true)}
+        />
+      )}
+
       {/* Particle Effects */}
-      {invitation.effects?.particles && <ParticleEffects enabled={true} />}
+      {effects.particles && showInvitation && <ParticleEffects enabled={true} />}
+      
+      {/* Romantic Particles */}
+      {effects.romanticParticles && showInvitation && <RomanticParticles enabled={true} />}
 
       {/* Header - только для десктопа */}
-      <header className="hidden md:block bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-center text-gray-900 font-playfair">
-            {invitation.title}
-          </h1>
-        </div>
-      </header>
+      {showInvitation && (
+        <header className="hidden md:block bg-white shadow-sm">
+          <div className="max-w-4xl mx-auto px-4 py-6">
+            <h1 className="text-3xl font-bold text-center text-gray-900 font-playfair">
+              {invitation.title}
+            </h1>
+          </div>
+        </header>
+      )}
 
       {/* Invitation Content */}
+      {showInvitation && (
       <div className="max-w-4xl mx-auto md:p-4" style={{ backgroundColor: 'transparent' }}>
         {/* Desktop View */}
         <div className="hidden md:block">
@@ -267,15 +342,7 @@ export default function InvitationViewPage() {
               height: 'auto',
               fontFamily: invitation.fontFamily,
               fontSize: `${invitation.fontSize}px`,
-              backgroundImage: invitation.backgroundImage ? `url(${invitation.backgroundImage})` : undefined,
-              backgroundColor: invitation.backgroundColor,
-              backgroundSize: 'cover',
-              backgroundPosition: invitation.effects?.parallax ? `center ${50 + parallaxOffset}px` : 'center',
-              backgroundRepeat: 'no-repeat',
-              filter: blurAmount > 0 ? `blur(${blurAmount}px)` : undefined,
-              background: invitation.effects?.gradientAnimation && invitation.backgroundColor
-                ? `linear-gradient(${gradientRotation}deg, ${invitation.backgroundColor} 0%, ${invitation.backgroundColor}dd 50%, ${invitation.backgroundColor} 100%), ${invitation.backgroundImage ? `url(${invitation.backgroundImage})` : ''}`
-                : undefined
+              backgroundColor: 'transparent' // Фон уже применен на главном контейнере
             }}
           >
             {/* Background Music Player */}
@@ -290,26 +357,13 @@ export default function InvitationViewPage() {
 
             {/* Render Blocks */}
             {invitation.blocks
+              .filter(b => b.type !== 'background') // Фон уже применен на главном контейнере
               .sort((a, b) => {
-                if (a.type === 'background') return -1
-                if (b.type === 'background') return 1
-                return 0
+                const aY = a.position?.y || 0
+                const bY = b.position?.y || 0
+                return aY - bY
               })
               .map((block, index) => {
-                // Для background блока - просто рендерим компонент
-                if (block.type === 'background') {
-                  return (
-                    <div
-                      key={block.id}
-                      className="absolute inset-0"
-                      style={{
-                        zIndex: 1
-                      }}
-                    >
-                      {renderBlock(block)}
-                    </div>
-                  )
-                }
 
                 if (
                   block.type === 'story' &&
@@ -354,7 +408,7 @@ export default function InvitationViewPage() {
                   <AnimatedBlock
                     key={block.id}
                     index={animatedBlockIndex}
-                    animations={invitation.animations}
+                    animations={animations}
                   >
                     <div
                       className="absolute"
@@ -378,38 +432,7 @@ export default function InvitationViewPage() {
 
         {/* Mobile View - Scrollable */}
         <div className="md:hidden">
-          {/* Fixed Background Layer */}
-          <div
-            className="fixed inset-0 -z-10"
-            style={{
-              backgroundImage: invitation.backgroundImage ? `url(${invitation.backgroundImage})` : undefined,
-              backgroundColor: invitation.backgroundColor,
-              backgroundSize: 'cover',
-              backgroundPosition: invitation.effects?.parallax ? `center ${50 + parallaxOffset}px` : 'center',
-              backgroundRepeat: 'no-repeat',
-              filter: blurAmount > 0 ? `blur(${blurAmount}px)` : undefined,
-              background: invitation.effects?.gradientAnimation && invitation.backgroundColor
-                ? `linear-gradient(${gradientRotation}deg, ${invitation.backgroundColor} 0%, ${invitation.backgroundColor}dd 50%, ${invitation.backgroundColor} 100%), ${invitation.backgroundImage ? `url(${invitation.backgroundImage})` : ''}`
-                : undefined
-            }}
-          />
-          
-          {/* Background Block Overlay */}
-          {invitation.blocks
-            .filter(b => b.type === 'background')
-            .map((block) => (
-              <div
-                key={block.id}
-                className="fixed inset-0 -z-10"
-                style={{
-                  backgroundImage: block.data?.image ? `url(${block.data.image})` : undefined,
-                  backgroundColor: block.data?.color || 'transparent',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat'
-                }}
-              />
-            ))}
+          {/* Background уже применен на главном контейнере, здесь не нужен дубликат */}
 
           {/* Scrollable Content */}
           <div
@@ -501,7 +524,7 @@ export default function InvitationViewPage() {
                     <AnimatedBlock
                       key={block.id}
                       index={blockIndex}
-                      animations={invitation.animations}
+                      animations={animations}
                     >
                       <div
                         className="relative mx-2 block"
@@ -524,6 +547,7 @@ export default function InvitationViewPage() {
           </div>
         </div>
       </div>
+      )}
     </div>
   )
 }

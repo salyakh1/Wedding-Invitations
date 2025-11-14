@@ -97,9 +97,9 @@ export default function StoryBlock({ block, isSelected, onMouseDown, invitation,
             <h3 
               className="font-semibold text-gray-800 text-center"
               style={{
-                fontFamily: invitation?.fontFamily || 'Montserrat',
-                fontSize: `${(invitation?.fontSize || 16) * 1.2}px`,
-                color: invitation?.textColor || '#2D3748'
+                fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                fontSize: `${((block.fontSize || invitation?.fontSize || 16) * 1.2)}px`,
+                color: block.textColor || invitation?.textColor || '#2D3748'
               }}
             >
               {block.data.title}
@@ -114,9 +114,9 @@ export default function StoryBlock({ block, isSelected, onMouseDown, invitation,
                 isPreview
                   ? undefined
                   : {
-                      fontFamily: invitation?.fontFamily || 'Montserrat',
-                      fontSize: `${invitation?.fontSize || 16}px`,
-                      color: invitation?.textColor || '#666'
+                      fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                      fontSize: `${block.fontSize || invitation?.fontSize || 16}px`,
+                      color: block.textColor || invitation?.textColor || '#666'
                     }
               }
             >
@@ -130,9 +130,9 @@ export default function StoryBlock({ block, isSelected, onMouseDown, invitation,
                     <p 
                       className="text-gray-600 text-sm leading-relaxed text-center"
                       style={{
-                        fontFamily: invitation?.fontFamily || 'Montserrat',
-                        fontSize: `${invitation?.fontSize || 16}px`,
-                        color: invitation?.textColor || '#4A5568'
+                        fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                        fontSize: `${block.fontSize || invitation?.fontSize || 16}px`,
+                        color: block.textColor || invitation?.textColor || '#4A5568'
                       }}
                     >
                       {item.content || 'Текст истории...'}

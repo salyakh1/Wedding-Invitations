@@ -210,6 +210,105 @@ export default function BlockSettingsPanel({
                   </div>
                 </div>
 
+                {/* Настройки шрифта для блока */}
+                {selectedBlock.type !== 'background' && (
+                  <div className="border-t pt-4 space-y-4">
+                    <h4 className="text-sm font-semibold text-gray-800 mb-3 flex items-center space-x-2">
+                      <Type className="w-4 h-4 text-purple-500" />
+                      <span>Настройки текста</span>
+                    </h4>
+
+                    {/* Выбор шрифта */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Шрифт
+                      </label>
+                      <select
+                        value={selectedBlock.fontFamily || invitation.fontFamily || 'Montserrat'}
+                        onChange={(e) => {
+                          onUpdateBlock({
+                            fontFamily: e.target.value
+                          })
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        style={{
+                          fontFamily: selectedBlock.fontFamily || invitation.fontFamily || 'Montserrat'
+                        }}
+                      >
+                        <optgroup label="Романтичные">
+                          <option value="Dancing Script" style={{ fontFamily: 'Dancing Script' }}>Dancing Script</option>
+                          <option value="Great Vibes" style={{ fontFamily: 'Great Vibes' }}>Great Vibes</option>
+                          <option value="Playfair Display" style={{ fontFamily: 'Playfair Display' }}>Playfair Display</option>
+                          <option value="Cormorant Garamond" style={{ fontFamily: 'Cormorant Garamond' }}>Cormorant Garamond</option>
+                          <option value="Satisfy" style={{ fontFamily: 'Satisfy' }}>Satisfy</option>
+                        </optgroup>
+                        <optgroup label="Обычные">
+                          <option value="Montserrat" style={{ fontFamily: 'Montserrat' }}>Montserrat</option>
+                          <option value="Open Sans" style={{ fontFamily: 'Open Sans' }}>Open Sans</option>
+                        </optgroup>
+                        <optgroup label="Аристократичные">
+                          <option value="Cinzel" style={{ fontFamily: 'Cinzel' }}>Cinzel</option>
+                          <option value="Libre Baskerville" style={{ fontFamily: 'Libre Baskerville' }}>Libre Baskerville</option>
+                        </optgroup>
+                      </select>
+                    </div>
+
+                    {/* Размер шрифта */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Размер шрифта: {selectedBlock.fontSize || invitation.fontSize || 16}px
+                      </label>
+                      <input
+                        type="range"
+                        min="10"
+                        max="48"
+                        step="1"
+                        value={selectedBlock.fontSize || invitation.fontSize || 16}
+                        onChange={(e) => {
+                          onUpdateBlock({
+                            fontSize: parseInt(e.target.value)
+                          })
+                        }}
+                        className="w-full accent-purple-500"
+                      />
+                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                        <span>10px</span>
+                        <span>48px</span>
+                      </div>
+                    </div>
+
+                    {/* Цвет текста */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Цвет текста
+                      </label>
+                      <div className="flex items-center space-x-3">
+                        <input
+                          type="color"
+                          value={selectedBlock.textColor || invitation.textColor || '#2D3748'}
+                          onChange={(e) => {
+                            onUpdateBlock({
+                              textColor: e.target.value
+                            })
+                          }}
+                          className="w-12 h-12 rounded-lg border-2 border-gray-300 cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={selectedBlock.textColor || invitation.textColor || '#2D3748'}
+                          onChange={(e) => {
+                            onUpdateBlock({
+                              textColor: e.target.value
+                            })
+                          }}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                          placeholder="#2D3748"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Специфичные настройки для каждого типа блока */}
                 
                 {/* Text Block */}
@@ -879,6 +978,177 @@ export default function BlockSettingsPanel({
                         placeholder="Дополнительная информация..."
                         rows={3}
                       />
+                    </div>
+                  </div>
+                )}
+
+                {/* Dress Code Block */}
+                {selectedBlock.type === 'dress-code' && (
+                  <div className="border-t pt-4 space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Описание дресс-кода
+                      </label>
+                      <textarea
+                        value={selectedBlock.data?.description || ''}
+                        onChange={(e) => {
+                          onUpdateBlock({
+                            data: {
+                              ...selectedBlock.data,
+                              description: e.target.value
+                            }
+                          })
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder="Укажите дресс-код для вашей свадьбы..."
+                        rows={4}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Guests Block */}
+                {selectedBlock.type === 'guests' && (
+                  <div className="border-t pt-4 space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Заголовок блока
+                      </label>
+                      <input
+                        type="text"
+                        value={selectedBlock.data?.title || 'Наши гости'}
+                        onChange={(e) => {
+                          onUpdateBlock({
+                            data: {
+                              ...selectedBlock.data,
+                              title: e.target.value
+                            }
+                          })
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder="Наши гости"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Гости
+                      </label>
+                      <div className="space-y-3 max-h-96 overflow-y-auto">
+                        {(selectedBlock.data?.guests || []).map((guest: any, index: number) => (
+                          <div key={index} className="border border-gray-200 rounded-lg p-3 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium text-gray-700">Гость #{index + 1}</span>
+                              <button
+                                onClick={() => {
+                                  const updatedGuests = [...(selectedBlock.data?.guests || [])]
+                                  updatedGuests.splice(index, 1)
+                                  onUpdateBlock({
+                                    data: {
+                                      ...selectedBlock.data,
+                                      guests: updatedGuests
+                                    }
+                                  })
+                                }}
+                                className="text-red-500 hover:text-red-700"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                            
+                            <div>
+                              <label className="block text-xs text-gray-600 mb-1">Имя</label>
+                              <input
+                                type="text"
+                                value={guest.name || ''}
+                                onChange={(e) => {
+                                  const updatedGuests = [...(selectedBlock.data?.guests || [])]
+                                  updatedGuests[index] = { ...guest, name: e.target.value }
+                                  onUpdateBlock({
+                                    data: {
+                                      ...selectedBlock.data,
+                                      guests: updatedGuests
+                                    }
+                                  })
+                                }}
+                                className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-green-500"
+                                placeholder="Имя гостя"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-xs text-gray-600 mb-1">Роль (опционально)</label>
+                              <input
+                                type="text"
+                                value={guest.role || ''}
+                                onChange={(e) => {
+                                  const updatedGuests = [...(selectedBlock.data?.guests || [])]
+                                  updatedGuests[index] = { ...guest, role: e.target.value }
+                                  onUpdateBlock({
+                                    data: {
+                                      ...selectedBlock.data,
+                                      guests: updatedGuests
+                                    }
+                                  })
+                                }}
+                                className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-green-500"
+                                placeholder="Организатор, Певцы, Танцевальная группа..."
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-xs text-gray-600 mb-1">Фотография</label>
+                              <div className="flex items-center space-x-2">
+                                {guest.photo && (
+                                  <img
+                                    src={guest.photo}
+                                    alt={guest.name || 'Гость'}
+                                    className="w-16 h-16 rounded-full object-cover border-2 border-gray-300"
+                                  />
+                                )}
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0]
+                                    if (file) {
+                                      const reader = new FileReader()
+                                      reader.onload = (event) => {
+                                        const updatedGuests = [...(selectedBlock.data?.guests || [])]
+                                        updatedGuests[index] = { ...guest, photo: event.target?.result as string }
+                                        onUpdateBlock({
+                                          data: {
+                                            ...selectedBlock.data,
+                                            guests: updatedGuests
+                                          }
+                                        })
+                                      }
+                                      reader.readAsDataURL(file)
+                                    }
+                                  }}
+                                  className="text-xs"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      <button
+                        onClick={() => {
+                          const updatedGuests = [...(selectedBlock.data?.guests || []), { name: '', role: '', photo: '' }]
+                          onUpdateBlock({
+                            data: {
+                              ...selectedBlock.data,
+                              guests: updatedGuests
+                            }
+                          })
+                        }}
+                        className="w-full py-2 px-4 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-600 hover:border-gray-400 hover:text-gray-700 transition-colors flex items-center justify-center space-x-2"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Добавить гостя</span>
+                      </button>
                     </div>
                   </div>
                 )}

@@ -13,9 +13,10 @@ interface WishesBlockProps {
   showEditButtons?: boolean
   invitationId?: string
   onAddWish?: (name: string, message: string) => Promise<void>
+  invitation?: any // Настройки текста из приглашения
 }
 
-export default function WishesBlock({ block, isSelected, onUpdate, onMouseDown, isPreview = false, showEditButtons = true, invitationId, onAddWish }: WishesBlockProps) {
+export default function WishesBlock({ block, isSelected, onUpdate, onMouseDown, isPreview = false, showEditButtons = true, invitationId, onAddWish, invitation }: WishesBlockProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [name, setName] = useState('')
   const [message, setMessage] = useState('')
@@ -134,10 +135,28 @@ export default function WishesBlock({ block, isSelected, onUpdate, onMouseDown, 
             <div className="text-center">
               <div className="flex items-center justify-center space-x-2 mb-3">
                 <MessageSquare className="w-6 h-6 text-indigo-500 animate-pulse drop-shadow-sm" />
-                <h3 className="text-lg font-bold text-gray-800 drop-shadow-sm">Оставьте пожелание</h3>
+                <h3 
+                  className="text-lg font-bold drop-shadow-sm"
+                  style={{
+                    fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                    fontSize: `${(block.fontSize || invitation?.fontSize || 16) * 1.1}px`,
+                    color: block.textColor || invitation?.textColor || '#2D3748'
+                  }}
+                >
+                  Оставьте пожелание
+                </h3>
                 <MessageSquare className="w-6 h-6 text-indigo-500 animate-pulse drop-shadow-sm" />
               </div>
-              <p className="text-sm text-gray-600 drop-shadow-sm">Поделитесь своими теплыми словами</p>
+              <p 
+                className="text-sm drop-shadow-sm"
+                style={{
+                  fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                  fontSize: `${block.fontSize || invitation?.fontSize || 16}px`,
+                  color: block.textColor || invitation?.textColor || '#4A5568'
+                }}
+              >
+                Поделитесь своими теплыми словами
+              </p>
             </div>
 
             <form 

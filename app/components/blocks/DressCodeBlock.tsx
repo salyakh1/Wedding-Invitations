@@ -1,9 +1,9 @@
 'use client'
 
 import { InvitationBlock } from '../../../types'
-import { Type } from 'lucide-react'
+import { Shirt } from 'lucide-react'
 
-interface TextBlockProps {
+interface DressCodeBlockProps {
   block: InvitationBlock
   isSelected: boolean
   onUpdate: (updates: Partial<InvitationBlock>) => void
@@ -13,7 +13,7 @@ interface TextBlockProps {
   showEditButtons?: boolean
 }
 
-export default function TextBlock({ block, isSelected, onMouseDown, invitation, isPreview = false }: TextBlockProps) {
+export default function DressCodeBlock({ block, isSelected, onMouseDown, invitation, isPreview = false }: DressCodeBlockProps) {
   const transparency = Math.max(0, Math.min(block.opacity ?? 1, 1))
   const gradientStart = (0.05 * transparency).toFixed(3)
   const gradientEnd = (0.02 * transparency).toFixed(3)
@@ -37,25 +37,41 @@ export default function TextBlock({ block, isSelected, onMouseDown, invitation, 
     >
       {/* Block Label */}
       {!isPreview && (
-        <div className="absolute top-2 left-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-3 py-1 rounded-full text-xs font-medium shadow-lg">
-          <Type className="w-3 h-3 inline mr-1" />
-          Текст
+        <div className="absolute top-2 left-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-3 py-1 rounded-full text-xs font-medium shadow-lg">
+          <Shirt className="w-3 h-3 inline mr-1" />
+          Дресс-код
         </div>
       )}
 
-      {/* Text Content */}
-      <div className="h-full flex items-center justify-center pt-8">
-        <p 
-          className="text-center leading-relaxed drop-shadow-sm"
+      {/* Content */}
+      <div className="h-full flex flex-col items-center justify-center pt-8 space-y-4">
+        <div className="flex items-center justify-center space-x-2 mb-2">
+          <Shirt className="w-8 h-8 text-purple-500 animate-pulse drop-shadow-sm" />
+          <h3 
+            className="text-2xl font-bold drop-shadow-sm"
+            style={{
+              fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+              fontSize: `${(block.fontSize || invitation?.fontSize || 16) * 1.3}px`,
+              color: block.textColor || invitation?.textColor || '#2D3748'
+            }}
+          >
+            Дресс-код
+          </h3>
+          <Shirt className="w-8 h-8 text-purple-500 animate-pulse drop-shadow-sm" />
+        </div>
+        
+        <div 
+          className="text-center leading-relaxed drop-shadow-sm max-w-lg"
           style={{
             fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
             fontSize: `${block.fontSize || invitation?.fontSize || 16}px`,
-            color: block.textColor || invitation?.textColor || '#2D3748'
+            color: block.textColor || invitation?.textColor || '#4A5568'
           }}
         >
-          {block.data.content || 'Ваш текст здесь...'}
-        </p>
+          {block.data?.description || 'Укажите дресс-код для вашей свадьбы...'}
+        </div>
       </div>
     </div>
   )
 }
+

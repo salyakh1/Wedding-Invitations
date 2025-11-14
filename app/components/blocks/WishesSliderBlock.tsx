@@ -12,9 +12,10 @@ interface WishesSliderBlockProps {
   isPreview?: boolean
   showEditButtons?: boolean
   wishes?: Wish[]
+  invitation?: any // Настройки текста из приглашения
 }
 
-export default function WishesSliderBlock({ block, isSelected, onUpdate, onMouseDown, isPreview = false, showEditButtons = true, wishes }: WishesSliderBlockProps) {
+export default function WishesSliderBlock({ block, isSelected, onUpdate, onMouseDown, isPreview = false, showEditButtons = true, wishes, invitation }: WishesSliderBlockProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(0)
 
@@ -141,10 +142,28 @@ export default function WishesSliderBlock({ block, isSelected, onUpdate, onMouse
             <div className="text-center">
               <div className="flex items-center justify-center space-x-2 mb-3">
                 <Sliders className="w-6 h-6 text-teal-500 animate-pulse drop-shadow-sm" />
-                <h3 className="text-lg font-bold text-gray-800 drop-shadow-sm">Пожелания гостей</h3>
+                <h3 
+                  className="text-lg font-bold drop-shadow-sm"
+                  style={{
+                    fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                    fontSize: `${(block.fontSize || invitation?.fontSize || 16) * 1.1}px`,
+                    color: block.textColor || invitation?.textColor || '#2D3748'
+                  }}
+                >
+                  Пожелания гостей
+                </h3>
                 <Sliders className="w-6 h-6 text-teal-500 animate-pulse drop-shadow-sm" />
               </div>
-              <p className="text-sm text-gray-600 drop-shadow-sm">Теплые слова от ваших близких</p>
+              <p 
+                className="text-sm drop-shadow-sm"
+                style={{
+                  fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                  fontSize: `${block.fontSize || invitation?.fontSize || 16}px`,
+                  color: block.textColor || invitation?.textColor || '#4A5568'
+                }}
+              >
+                Теплые слова от ваших близких
+              </p>
             </div>
 
             {/* Wish Display */}
@@ -158,10 +177,24 @@ export default function WishesSliderBlock({ block, isSelected, onUpdate, onMouse
                     WebkitBackdropFilter: 'blur(12px)'
                   }}
                 >
-                  <h4 className="font-bold text-gray-800 mb-3 text-center drop-shadow-sm">
+                  <h4 
+                    className="font-bold mb-3 text-center drop-shadow-sm"
+                    style={{
+                      fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                      fontSize: `${(block.fontSize || invitation?.fontSize || 16) * 1.1}px`,
+                      color: block.textColor || invitation?.textColor || '#2D3748'
+                    }}
+                  >
                     {displayWishes[currentSlide]?.name || 'Гость'}
                   </h4>
-                  <p className="text-gray-700 italic text-center drop-shadow-sm">
+                  <p 
+                    className="italic text-center drop-shadow-sm"
+                    style={{
+                      fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                      fontSize: `${block.fontSize || invitation?.fontSize || 16}px`,
+                      color: block.textColor || invitation?.textColor || '#4A5568'
+                    }}
+                  >
                     "{displayWishes[currentSlide]?.message || 'Пожелание...'}"
                   </p>
                 </div>

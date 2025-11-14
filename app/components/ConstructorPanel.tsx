@@ -14,7 +14,9 @@ import {
   Trash2,
   Edit3,
   Calendar,
-  Clock
+  Clock,
+  Shirt,
+  Users
 } from 'lucide-react'
 
 interface ConstructorPanelProps {
@@ -32,7 +34,9 @@ const blockTypes = [
   { type: 'wishes', label: 'Пожелания', icon: MessageSquare, color: 'bg-indigo-500' },
   { type: 'wishes-slider', label: 'Слайдер пожеланий', icon: Sliders, color: 'bg-teal-500' },
   { type: 'wedding-date', label: 'День свадьбы', icon: Calendar, color: 'bg-rose-500' },
-  { type: 'countdown', label: 'Обратный отсчет', icon: Clock, color: 'bg-violet-500' }
+  { type: 'countdown', label: 'Обратный отсчет', icon: Clock, color: 'bg-violet-500' },
+  { type: 'dress-code', label: 'Дресс-код', icon: Shirt, color: 'bg-purple-500' },
+  { type: 'guests', label: 'Гости', icon: Users, color: 'bg-amber-500' }
 ]
 
 export default function ConstructorPanel({ invitation, onUpdateInvitation }: ConstructorPanelProps) {
@@ -97,6 +101,10 @@ export default function ConstructorPanel({ invitation, onUpdateInvitation }: Con
         return { weddingDate: '', weddingTime: '', weddingLocation: '', description: '' }
       case 'countdown':
         return { weddingDate: '', title: 'До свадьбы осталось', description: '' }
+      case 'dress-code':
+        return { description: 'Укажите дресс-код для вашей свадьбы...' }
+      case 'guests':
+        return { title: 'Наши гости', guests: [] }
       default:
         return {}
     }

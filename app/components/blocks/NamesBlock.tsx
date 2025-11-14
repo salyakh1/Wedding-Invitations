@@ -51,9 +51,9 @@ export default function NamesBlock({ block, isSelected, onMouseDown, invitation,
             <h2 
               className="text-3xl font-bold drop-shadow-sm"
               style={{
-                fontFamily: invitation?.fontFamily || 'Montserrat',
-                fontSize: `${(invitation?.fontSize || 16) * 1.5}px`,
-                color: invitation?.textColor || '#2D3748'
+                fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                fontSize: `${((block.fontSize || invitation?.fontSize || 16) * 1.5)}px`,
+                color: block.textColor || invitation?.textColor || '#2D3748'
               }}
             >
               {block.data.groomName || 'Имя жениха'}
@@ -62,9 +62,9 @@ export default function NamesBlock({ block, isSelected, onMouseDown, invitation,
             <h2 
               className="text-3xl font-bold drop-shadow-sm"
               style={{
-                fontFamily: invitation?.fontFamily || 'Montserrat',
-                fontSize: `${(invitation?.fontSize || 16) * 1.5}px`,
-                color: invitation?.textColor || '#2D3748'
+                fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                fontSize: `${((block.fontSize || invitation?.fontSize || 16) * 1.5)}px`,
+                color: block.textColor || invitation?.textColor || '#2D3748'
               }}
             >
               {block.data.brideName || 'Имя невесты'}
@@ -76,9 +76,9 @@ export default function NamesBlock({ block, isSelected, onMouseDown, invitation,
             <h2 
               className="text-3xl font-bold drop-shadow-sm"
               style={{
-                fontFamily: invitation?.fontFamily || 'Montserrat',
-                fontSize: `${(invitation?.fontSize || 16) * 1.5}px`,
-                color: invitation?.textColor || '#2D3748'
+                fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                fontSize: `${((block.fontSize || invitation?.fontSize || 16) * 1.5)}px`,
+                color: block.textColor || invitation?.textColor || '#2D3748'
               }}
             >
               {block.data.groomName || 'Имя жениха'}
@@ -89,9 +89,9 @@ export default function NamesBlock({ block, isSelected, onMouseDown, invitation,
             <h2 
               className="text-3xl font-bold drop-shadow-sm"
               style={{
-                fontFamily: invitation?.fontFamily || 'Montserrat',
-                fontSize: `${(invitation?.fontSize || 16) * 1.5}px`,
-                color: invitation?.textColor || '#2D3748'
+                fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                fontSize: `${((block.fontSize || invitation?.fontSize || 16) * 1.5)}px`,
+                color: block.textColor || invitation?.textColor || '#2D3748'
               }}
             >
               {block.data.brideName || 'Имя невесты'}

@@ -10,7 +10,7 @@ export default function ParticleEffects({ enabled }: ParticleEffectsProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    if (!enabled || !canvasRef.current) return
+    if (!enabled || !canvasRef.current || typeof window === 'undefined') return
 
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
@@ -18,11 +18,15 @@ export default function ParticleEffects({ enabled }: ParticleEffectsProps) {
 
     // Устанавливаем размеры canvas
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      if (typeof window !== 'undefined') {
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
+      }
     }
     resizeCanvas()
-    window.addEventListener('resize', resizeCanvas)
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', resizeCanvas)
+    }
 
     // Типы частиц
     const particleTypes = ['heart', 'star', 'confetti']
@@ -38,8 +42,23 @@ export default function ParticleEffects({ enabled }: ParticleEffectsProps) {
       rotationSpeed: number
     }> = []
 
-    // Создаем частицы
+    // Создаем частицы (только после инициализации canvas)
     const createParticle = () => {
+      if (canvas.width === 0 || canvas.height === 0) {
+        // Если canvas еще не инициализирован, используем дефолтные значения
+        return {
+          x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 800),
+          y: -10,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: Math.random() * 0.5 + 0.3,
+          size: Math.random() * 8 + 4,
+          type: 'confetti',
+          color: '#ff6b9d',
+          rotation: Math.random() * Math.PI * 2,
+          rotationSpeed: (Math.random() - 0.5) * 0.1
+        }
+      }
+
       const type = particleTypes[Math.floor(Math.random() * particleTypes.length)]
       const colors = {
         heart: ['#ff6b9d', '#ff8fab', '#ffa8c5'],
@@ -62,7 +81,7 @@ export default function ParticleEffects({ enabled }: ParticleEffectsProps) {
       }
     }
 
-    // Инициализация частиц
+    // Инициализация частиц (только после resizeCanvas)
     for (let i = 0; i < 30; i++) {
       particles.push(createParticle())
     }
@@ -114,7 +133,7 @@ export default function ParticleEffects({ enabled }: ParticleEffectsProps) {
 
     // Анимация
     const animate = () => {
-      if (!enabled) return
+      if (!enabled || canvas.width === 0 || canvas.height === 0) return
 
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
@@ -139,13 +158,19 @@ export default function ParticleEffects({ enabled }: ParticleEffectsProps) {
         }
       })
 
-      requestAnimationFrame(animate)
+      if (typeof window !== 'undefined') {
+        requestAnimationFrame(animate)
+      }
     }
 
-    animate()
+    if (typeof window !== 'undefined') {
+      animate()
+    }
 
     return () => {
-      window.removeEventListener('resize', resizeCanvas)
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', resizeCanvas)
+      }
     }
   }, [enabled])
 
@@ -154,7 +179,7 @@ export default function ParticleEffects({ enabled }: ParticleEffectsProps) {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed top-0 left-0 w-full h-full pointer-events-none z-0"
+      className="fixed top-0 left-0 w-full h-full pointer-events-none z-10"
       style={{ opacity: 0.6 }}
     />
   )

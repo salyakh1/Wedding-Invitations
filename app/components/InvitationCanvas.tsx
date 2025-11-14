@@ -12,6 +12,8 @@ import WishesBlock from './blocks/WishesBlock'
 import WishesSliderBlock from './blocks/WishesSliderBlock'
 import WeddingDateBlock from './blocks/WeddingDateBlock'
 import CountdownBlock from './blocks/CountdownBlock'
+import DressCodeBlock from './blocks/DressCodeBlock'
+import GuestsBlock from './blocks/GuestsBlock'
 
 interface InvitationCanvasProps {
   invitation: Invitation | null
@@ -120,6 +122,10 @@ export default function InvitationCanvas({ invitation, onUpdateInvitation, selec
         return <WeddingDateBlock {...commonProps} />
       case 'countdown':
         return <CountdownBlock {...commonProps} />
+      case 'dress-code':
+        return <DressCodeBlock {...commonProps} />
+      case 'guests':
+        return <GuestsBlock {...commonProps} />
       default:
         return null
     }

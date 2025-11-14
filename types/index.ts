@@ -1,11 +1,15 @@
 export interface InvitationBlock {
   id: string
-  type: 'background' | 'names' | 'text' | 'video' | 'map' | 'story' | 'wishes' | 'wishes-slider' | 'wedding-date' | 'countdown'
+  type: 'background' | 'names' | 'text' | 'video' | 'map' | 'story' | 'wishes' | 'wishes-slider' | 'wedding-date' | 'countdown' | 'dress-code' | 'guests'
   position: { x: number; y: number }
   size: { width: number; height: number }
   data: any
   opacity: number
   marginBottom?: number // Отступ снизу в пикселях
+  // Индивидуальные настройки шрифта для каждого блока
+  fontFamily?: string
+  fontSize?: number
+  textColor?: string
 }
 
 export interface Invitation {
@@ -32,6 +36,8 @@ export interface Invitation {
     particles?: boolean
     gradientAnimation?: boolean
     blurOnScroll?: boolean
+    roseOpeningAnimation?: boolean
+    romanticParticles?: boolean
   }
 }
 

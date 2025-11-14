@@ -10,9 +10,10 @@ interface WeddingDateBlockProps {
   onMouseDown: (e: React.MouseEvent) => void
   isPreview?: boolean
   showEditButtons?: boolean
+  invitation?: any // Настройки текста из приглашения
 }
 
-export default function WeddingDateBlock({ block, isSelected, onMouseDown, isPreview = false }: WeddingDateBlockProps) {
+export default function WeddingDateBlock({ block, isSelected, onMouseDown, isPreview = false, invitation }: WeddingDateBlockProps) {
   const transparency = Math.max(0, Math.min(block.opacity ?? 1, 1))
   const gradientStart = (0.05 * transparency).toFixed(3)
   const gradientEnd = (0.02 * transparency).toFixed(3)
@@ -61,7 +62,16 @@ export default function WeddingDateBlock({ block, isSelected, onMouseDown, isPre
             <div className="space-y-3">
               <div className="flex items-center justify-center space-x-2">
                 <Heart className="w-6 h-6 text-pink-500 animate-pulse drop-shadow-sm" />
-                <h3 className="text-xl font-bold text-gray-800 drop-shadow-sm">День свадьбы</h3>
+                <h3 
+                  className="text-xl font-bold drop-shadow-sm"
+                  style={{
+                    fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                    fontSize: `${(block.fontSize || invitation?.fontSize || 16) * 1.3}px`,
+                    color: block.textColor || invitation?.textColor || '#2D3748'
+                  }}
+                >
+                  День свадьбы
+                </h3>
                 <Heart className="w-6 h-6 text-pink-500 animate-pulse drop-shadow-sm" />
               </div>
               
@@ -73,25 +83,53 @@ export default function WeddingDateBlock({ block, isSelected, onMouseDown, isPre
                   WebkitBackdropFilter: 'blur(12px)'
                 }}
               >
-                <p className="text-lg font-semibold text-gray-800 drop-shadow-sm">
+                <p 
+                  className="text-lg font-semibold drop-shadow-sm"
+                  style={{
+                    fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                    fontSize: `${(block.fontSize || invitation?.fontSize || 16) * 1.1}px`,
+                    color: block.textColor || invitation?.textColor || '#2D3748'
+                  }}
+                >
                   {formatDate(block.data.weddingDate)}
                 </p>
                 
                 {block.data.weddingTime && (
-                  <p className="text-md text-gray-700 drop-shadow-sm mt-1">
+                  <p 
+                    className="text-md drop-shadow-sm mt-1"
+                    style={{
+                      fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                      fontSize: `${block.fontSize || invitation?.fontSize || 16}px`,
+                      color: block.textColor || invitation?.textColor || '#4A5568'
+                    }}
+                  >
                     Время: {block.data.weddingTime}
                   </p>
                 )}
                 
                 {block.data.weddingLocation && (
-                  <p className="text-md text-gray-700 drop-shadow-sm mt-1">
+                  <p 
+                    className="text-md drop-shadow-sm mt-1"
+                    style={{
+                      fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                      fontSize: `${block.fontSize || invitation?.fontSize || 16}px`,
+                      color: block.textColor || invitation?.textColor || '#4A5568'
+                    }}
+                  >
                     Место: {block.data.weddingLocation}
                   </p>
                 )}
               </div>
               
               {block.data.description && (
-                <p className="text-sm text-gray-600 drop-shadow-sm mt-2">
+                <p 
+                  className="text-sm drop-shadow-sm mt-2"
+                  style={{
+                    fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                    fontSize: `${block.fontSize || invitation?.fontSize || 16}px`,
+                    color: block.textColor || invitation?.textColor || '#718096'
+                  }}
+                >
                   {block.data.description}
                 </p>
               )}
