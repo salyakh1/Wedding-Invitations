@@ -1,4 +1,25 @@
-import { supabase } from './supabase'
+import { createClient } from '@supabase/supabase-js'
+
+// Создаем клиент Supabase для Storage
+// Используем createClient вместо createBrowserClient для более надежной работы с сессией
+const getSupabaseClient = () => {
+  if (typeof window === 'undefined') {
+    throw new Error('Storage functions can only be called on the client side')
+  }
+  
+  // createClient автоматически использует localStorage для сессии
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    }
+  )
+}
 
 /**
  * Загружает видео файл в Supabase Storage
@@ -13,6 +34,16 @@ export async function uploadVideoToStorage(
   blockId: string
 ): Promise<string | null> {
   try {
+    // Используем клиент с правильной настройкой сессии
+    const supabase = getSupabaseClient()
+    
+    // Проверяем, что пользователь аутентифицирован
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      console.error('User not authenticated:', authError)
+      throw new Error('User must be authenticated to upload videos')
+    }
+    
     // Создаем уникальное имя файла
     const fileExt = file.name.split('.').pop()
     const fileName = `${invitationId}/${blockId}-${Date.now()}.${fileExt}`
@@ -31,7 +62,7 @@ export async function uploadVideoToStorage(
     }
 
     // Получаем публичный URL
-    const { data: urlData } = supabase.storage
+    const { data: urlData } = getSupabaseClient().storage
       .from('videos')
       .getPublicUrl(fileName)
 
@@ -53,6 +84,9 @@ export async function uploadVideoToStorage(
  */
 export async function deleteVideoFromStorage(videoUrl: string): Promise<void> {
   try {
+    // Используем клиент с правильной настройкой сессии
+    const supabase = getSupabaseClient()
+    
     // Извлекаем путь к файлу из URL
     const urlParts = videoUrl.split('/videos/')
     if (urlParts.length < 2) {

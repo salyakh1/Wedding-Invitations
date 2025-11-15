@@ -30,11 +30,12 @@ USING (bucket_id = 'videos');
 
 -- 4. Создаем политику для загрузки видео (только для аутентифицированных пользователей)
 -- Для INSERT политик используется только WITH CHECK
+-- Используем auth.uid() IS NOT NULL вместо auth.role() для правильной проверки аутентификации
 CREATE POLICY "Authenticated users can upload videos"
 ON storage.objects FOR INSERT
 WITH CHECK (
   bucket_id = 'videos' 
-  AND (auth.role() = 'authenticated' OR auth.role() = 'service_role')
+  AND auth.uid() IS NOT NULL
 );
 
 -- 5. Создаем политику для обновления видео (только для аутентифицированных пользователей)
@@ -42,11 +43,11 @@ CREATE POLICY "Authenticated users can update videos"
 ON storage.objects FOR UPDATE
 USING (
   bucket_id = 'videos' 
-  AND auth.role() = 'authenticated'
+  AND auth.uid() IS NOT NULL
 )
 WITH CHECK (
   bucket_id = 'videos' 
-  AND auth.role() = 'authenticated'
+  AND auth.uid() IS NOT NULL
 );
 
 -- 6. Создаем политику для удаления видео (только для аутентифицированных пользователей)
@@ -54,7 +55,7 @@ CREATE POLICY "Authenticated users can delete videos"
 ON storage.objects FOR DELETE
 USING (
   bucket_id = 'videos' 
-  AND auth.role() = 'authenticated'
+  AND auth.uid() IS NOT NULL
 );
 
 -- Проверка: убедитесь, что bucket создан
