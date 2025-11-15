@@ -96,6 +96,32 @@ export default function InvitationViewPage() {
         return
       }
       
+      // КРИТИЧЕСКАЯ ПРОВЕРКА: парсим blocks если это JSON строка
+      let parsedBlocks = data.blocks
+      
+      // Если blocks это строка, пытаемся распарсить
+      if (typeof parsedBlocks === 'string') {
+        try {
+          parsedBlocks = JSON.parse(parsedBlocks)
+          console.log('✅ Parsed blocks from JSON string')
+        } catch (e) {
+          console.error('❌ Failed to parse blocks JSON string:', e)
+          parsedBlocks = []
+        }
+      }
+      
+      // Если blocks это null или undefined, используем пустой массив
+      if (!parsedBlocks) {
+        console.warn('⚠️ Blocks is null/undefined, using empty array')
+        parsedBlocks = []
+      }
+      
+      // Убеждаемся, что blocks это массив
+      if (!Array.isArray(parsedBlocks)) {
+        console.error('❌ Blocks is not an array after parsing:', typeof parsedBlocks, parsedBlocks)
+        parsedBlocks = []
+      }
+      
       // Маппим данные из snake_case в camelCase
       const mappedInvitation = {
         id: data.id,
@@ -105,7 +131,7 @@ export default function InvitationViewPage() {
         backgroundMusic: data.background_music,
         fontFamily: data.font_family,
         fontSize: data.font_size,
-        blocks: data.blocks || [],
+        blocks: parsedBlocks,
         animations: data.animations || undefined,
         effects: data.effects || undefined,
         createdAt: data.created_at,
@@ -114,39 +140,18 @@ export default function InvitationViewPage() {
       
       console.log('=== LOADED INVITATION DATA ===')
       console.log('Raw data from Supabase:', data)
+      console.log('Raw blocks type:', typeof data.blocks)
+      console.log('Raw blocks value:', data.blocks)
+      console.log('Parsed blocks:', parsedBlocks)
+      console.log('Parsed blocks type:', typeof parsedBlocks)
+      console.log('Parsed blocks is array:', Array.isArray(parsedBlocks))
       console.log('Mapped invitation:', mappedInvitation)
-      console.log('Blocks from database:', data.blocks)
-      console.log('Blocks type:', typeof data.blocks)
-      console.log('Blocks is array:', Array.isArray(data.blocks))
       console.log('Blocks count:', mappedInvitation.blocks?.length || 0)
       console.log('Blocks content:', JSON.stringify(mappedInvitation.blocks, null, 2))
       console.log('Has animations column:', 'animations' in data)
       console.log('Has effects column:', 'effects' in data)
       console.log('Animations value:', data.animations)
       console.log('Effects value:', data.effects)
-      
-      // Проверяем, что блоки действительно есть
-      if (!data.blocks || (Array.isArray(data.blocks) && data.blocks.length === 0)) {
-        console.warn('⚠️ WARNING: No blocks found in invitation!')
-        console.warn('Invitation ID:', data.id)
-        console.warn('Invitation title:', data.title)
-      }
-      
-      // Проверяем, что blocks - это массив
-      if (!Array.isArray(mappedInvitation.blocks)) {
-        console.error('ERROR: blocks is not an array!', mappedInvitation.blocks)
-        // Если blocks это строка JSON, пытаемся распарсить
-        if (typeof mappedInvitation.blocks === 'string') {
-          try {
-            mappedInvitation.blocks = JSON.parse(mappedInvitation.blocks)
-          } catch (e) {
-            console.error('Failed to parse blocks JSON:', e)
-            mappedInvitation.blocks = []
-          }
-        } else {
-          mappedInvitation.blocks = []
-        }
-      }
       
       // Убеждаемся, что все блоки имеют правильную структуру
       if (Array.isArray(mappedInvitation.blocks)) {
@@ -160,6 +165,11 @@ export default function InvitationViewPage() {
               return null
             }
           }
+          // Проверяем, что блок имеет обязательные поля
+          if (!block || !block.type || !block.id) {
+            console.warn('⚠️ Invalid block structure:', block)
+            return null
+          }
           return block
         }).filter((block: any) => block !== null)
       }
@@ -171,12 +181,14 @@ export default function InvitationViewPage() {
       if (!mappedInvitation.blocks || mappedInvitation.blocks.length === 0) {
         console.error('❌ КРИТИЧЕСКАЯ ОШИБКА: Блоки не загружены или пусты!')
         console.error('Invitation ID:', data.id)
+        console.error('Invitation title:', data.title)
         console.error('Raw blocks from DB:', data.blocks)
-        console.error('Blocks type:', typeof data.blocks)
-        console.error('Blocks is array:', Array.isArray(data.blocks))
+        console.error('Raw blocks type:', typeof data.blocks)
+        console.error('Raw blocks is array:', Array.isArray(data.blocks))
       } else {
         console.log('✅ Блоки успешно загружены:', mappedInvitation.blocks.length, 'блоков')
         console.log('Типы блоков:', mappedInvitation.blocks.map((b: any) => b.type))
+        console.log('Block IDs:', mappedInvitation.blocks.map((b: any) => b.id))
       }
       
       setInvitation(mappedInvitation)
