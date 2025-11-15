@@ -46,8 +46,8 @@ export default function VideoBlock({ block, isSelected, onMouseDown, isPreview =
       {/* Video Content */}
       <div className="flex flex-col items-center justify-center space-y-4 pt-8">
         <div className="text-center">
-          {/* Загруженное видео */}
-          {block.data?.videoFile ? (
+          {/* Загруженное видео - приоритет у URL из Storage, затем base64 для обратной совместимости */}
+          {(block.data?.videoUrl || block.data?.videoFile) ? (
             <div 
               className={`${block.data.shape === 'circle' ? 'rounded-full' : 'rounded-xl'} overflow-hidden shadow-lg`}
               style={{
@@ -56,7 +56,7 @@ export default function VideoBlock({ block, isSelected, onMouseDown, isPreview =
               }}
             >
               <video
-                src={block.data.videoFile}
+                src={block.data?.videoUrl || block.data?.videoFile}
                 width={block.data.size || 200}
                 height={block.data.size || 200}
                 controls
@@ -73,7 +73,7 @@ export default function VideoBlock({ block, isSelected, onMouseDown, isPreview =
           ) : null}
 
           {/* Заглушка если нет видео */}
-          {!block.data?.videoFile && (
+          {!block.data?.videoUrl && !block.data?.videoFile && (
             <div className="flex flex-col items-center space-y-2">
               <Video className="w-12 h-12 text-gray-400 drop-shadow-sm" />
               <p className={`text-sm text-gray-500 ${isPreview ? 'hidden' : ''}`}>Добавьте видео</p>

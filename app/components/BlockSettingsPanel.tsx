@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Invitation, InvitationBlock } from '../../types'
 import { Settings, Layers, Edit, Circle, Square, Upload, Trash2, Plus, Type, Image, Heart, ArrowUp, ArrowDown } from 'lucide-react'
+import { uploadVideoToStorage } from '../../lib/storage'
 
 interface BlockSettingsPanelProps {
   invitation: Invitation | null
@@ -18,6 +19,7 @@ export default function BlockSettingsPanel({
   onUpdateBlock 
 }: BlockSettingsPanelProps) {
   const [settingsMode, setSettingsMode] = useState<'all' | 'selected'>('all')
+  const [uploadingVideo, setUploadingVideo] = useState(false)
 
   if (!invitation) {
     return (
@@ -429,37 +431,64 @@ export default function BlockSettingsPanel({
                       <input
                         type="file"
                         accept="video/*"
-                        onChange={(e) => {
+                        disabled={uploadingVideo}
+                        onChange={async (e) => {
                           const file = e.target.files?.[0]
-                          if (file) {
-                            if (file.size > 50 * 1024 * 1024) {
-                              alert('Размер файла не должен превышать 50MB')
+                          if (!file) return
+
+                          if (file.size > 50 * 1024 * 1024) {
+                            alert('Размер файла не должен превышать 50MB')
+                            return
+                          }
+
+                          if (!invitation?.id || !selectedBlock?.id) {
+                            alert('Ошибка: отсутствует ID приглашения или блока')
+                            return
+                          }
+
+                          setUploadingVideo(true)
+                          
+                          try {
+                            // Загружаем видео в Supabase Storage
+                            const videoUrl = await uploadVideoToStorage(
+                              file,
+                              invitation.id,
+                              selectedBlock.id
+                            )
+
+                            if (!videoUrl) {
+                              alert('Ошибка при загрузке видео. Попробуйте еще раз.')
+                              setUploadingVideo(false)
                               return
                             }
-                            
-                            // Конвертируем видео в base64 для сохранения в базу данных
-                            const reader = new FileReader()
-                            reader.onload = (event) => {
-                              const base64Video = event.target?.result as string
-                              onUpdateBlock({
-                                data: {
-                                  ...selectedBlock.data,
-                                  videoFile: base64Video, // Сохраняем base64 вместо blob URL
-                                  videoFileName: file.name,
-                                  videoFileSize: file.size,
-                                  videoFileType: file.type
-                                }
-                              })
-                            }
-                            reader.onerror = () => {
-                              alert('Ошибка при загрузке видео')
-                            }
-                            reader.readAsDataURL(file)
+
+                            // Сохраняем URL из Storage в базу данных
+                            onUpdateBlock({
+                              data: {
+                                ...selectedBlock.data,
+                                videoUrl: videoUrl, // URL из Supabase Storage
+                                videoFileName: file.name,
+                                videoFileSize: file.size,
+                                videoFileType: file.type
+                              }
+                            })
+
+                            alert('Видео успешно загружено!')
+                          } catch (error) {
+                            console.error('Error uploading video:', error)
+                            alert('Ошибка при загрузке видео. Попробуйте еще раз.')
+                          } finally {
+                            setUploadingVideo(false)
                           }
                         }}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
                       />
-                      {selectedBlock.data?.videoFileName && (
+                      {uploadingVideo && (
+                        <p className="text-xs text-blue-500 mt-1">
+                          Загрузка видео...
+                        </p>
+                      )}
+                      {selectedBlock.data?.videoFileName && !uploadingVideo && (
                         <p className="text-xs text-gray-500 mt-1">
                           Файл: {selectedBlock.data.videoFileName}
                         </p>
