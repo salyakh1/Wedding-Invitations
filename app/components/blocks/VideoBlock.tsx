@@ -10,9 +10,10 @@ interface VideoBlockProps {
   onMouseDown: (e: React.MouseEvent) => void
   isPreview?: boolean
   showEditButtons?: boolean
+  invitation?: any // Настройки текста из приглашения
 }
 
-export default function VideoBlock({ block, isSelected, onMouseDown, isPreview = false }: VideoBlockProps) {
+export default function VideoBlock({ block, isSelected, onMouseDown, isPreview = false, invitation }: VideoBlockProps) {
   const transparency = Math.max(0, Math.min(block.opacity ?? 1, 1))
   const gradientStart = (0.05 * transparency).toFixed(3)
   const gradientEnd = (0.02 * transparency).toFixed(3)
@@ -46,7 +47,7 @@ export default function VideoBlock({ block, isSelected, onMouseDown, isPreview =
       <div className="flex flex-col items-center justify-center space-y-4 pt-8">
         <div className="text-center">
           {/* Загруженное видео */}
-          {block.data.videoFile ? (
+          {block.data?.videoFile ? (
             <div 
               className={`${block.data.shape === 'circle' ? 'rounded-full' : 'rounded-xl'} overflow-hidden shadow-lg`}
               style={{
@@ -60,20 +61,36 @@ export default function VideoBlock({ block, isSelected, onMouseDown, isPreview =
                 height={block.data.size || 200}
                 controls
                 className="w-full h-full object-contain"
-              />
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: '100%'
+                }}
+                preload="metadata"
+              >
+                Ваш браузер не поддерживает видео элемент.
+              </video>
             </div>
           ) : null}
 
           {/* Заглушка если нет видео */}
-          {!block.data.videoFile && (
+          {!block.data?.videoFile && (
             <div className="flex flex-col items-center space-y-2">
               <Video className="w-12 h-12 text-gray-400 drop-shadow-sm" />
-              <p className="text-sm text-gray-500">Добавьте видео</p>
+              <p className={`text-sm text-gray-500 ${isPreview ? 'hidden' : ''}`}>Добавьте видео</p>
             </div>
           )}
           
-          {block.data.description && (
-            <p className="text-sm text-gray-600 mt-2 drop-shadow-sm">{block.data.description}</p>
+          {block.data?.description && (
+            <p 
+              className="text-sm mt-2 drop-shadow-sm"
+              style={{
+                fontFamily: block.fontFamily || invitation?.fontFamily || 'Montserrat',
+                fontSize: `${block.fontSize || invitation?.fontSize || 16}px`,
+                color: block.textColor || invitation?.textColor || '#4A5568'
+              }}
+            >
+              {block.data.description}
+            </p>
           )}
         </div>
       </div>

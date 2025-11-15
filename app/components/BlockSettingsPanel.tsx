@@ -437,15 +437,24 @@ export default function BlockSettingsPanel({
                               return
                             }
                             
-                            const videoUrl = URL.createObjectURL(file)
-                            onUpdateBlock({
-                              data: {
-                                ...selectedBlock.data,
-                                videoFile: videoUrl,
-                                videoFileName: file.name,
-                                videoFileSize: file.size
-                              }
-                            })
+                            // Конвертируем видео в base64 для сохранения в базу данных
+                            const reader = new FileReader()
+                            reader.onload = (event) => {
+                              const base64Video = event.target?.result as string
+                              onUpdateBlock({
+                                data: {
+                                  ...selectedBlock.data,
+                                  videoFile: base64Video, // Сохраняем base64 вместо blob URL
+                                  videoFileName: file.name,
+                                  videoFileSize: file.size,
+                                  videoFileType: file.type
+                                }
+                              })
+                            }
+                            reader.onerror = () => {
+                              alert('Ошибка при загрузке видео')
+                            }
+                            reader.readAsDataURL(file)
                           }
                         }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
