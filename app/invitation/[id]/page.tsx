@@ -355,17 +355,27 @@ export default function InvitationViewPage() {
 
   return (
     <div className="min-h-screen relative">
-      {/* Background Layer - Full Screen (Desktop & Mobile) */}
+      {/* Background Layer - Full Screen (Desktop & Mobile) - ФИКСИРОВАННЫЙ */}
       <div
         className="fixed inset-0 -z-20"
         style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: '100%',
+          height: '100%',
           ...(effects.gradientAnimation && backgroundColor
             ? {
                 background: `linear-gradient(${gradientRotation}deg, ${backgroundColor} 0%, ${backgroundColor}dd 50%, ${backgroundColor} 100%)${backgroundImage ? `, url(${backgroundImage})` : ''}`,
                 backgroundSize: 'cover',
                 backgroundPosition: effects.parallax ? `center ${50 + parallaxOffset}px` : 'center',
                 backgroundRepeat: 'no-repeat',
-                backgroundAttachment: 'fixed'
+                backgroundAttachment: 'fixed',
+                // Для мобильных устройств, где background-attachment: fixed не работает
+                WebkitBackgroundAttachment: 'fixed',
+                MozBackgroundAttachment: 'fixed'
               }
             : {
                 backgroundImage: backgroundImage ? `url(${backgroundImage})` : undefined,
@@ -373,9 +383,15 @@ export default function InvitationViewPage() {
                 backgroundSize: 'cover',
                 backgroundPosition: effects.parallax ? `center ${50 + parallaxOffset}px` : 'center',
                 backgroundRepeat: 'no-repeat',
-                backgroundAttachment: 'fixed'
+                backgroundAttachment: 'fixed',
+                // Для мобильных устройств, где background-attachment: fixed не работает
+                WebkitBackgroundAttachment: 'fixed',
+                MozBackgroundAttachment: 'fixed'
               }),
-          filter: blurAmount > 0 ? `blur(${blurAmount}px)` : undefined
+          filter: blurAmount > 0 ? `blur(${blurAmount}px)` : undefined,
+          // Убеждаемся, что фон не прокручивается
+          willChange: 'transform',
+          transform: 'translateZ(0)' // Аппаратное ускорение для фиксации
         }}
       />
 
@@ -406,7 +422,7 @@ export default function InvitationViewPage() {
 
       {/* Invitation Content */}
       {showInvitation && (
-      <div className="max-w-4xl mx-auto md:p-4" style={{ backgroundColor: 'transparent' }}>
+      <div className="max-w-4xl mx-auto md:p-4 relative z-10" style={{ backgroundColor: 'transparent' }}>
         {/* Desktop View */}
         <div className="hidden md:block">
           <div
@@ -526,7 +542,7 @@ export default function InvitationViewPage() {
         </div>
 
         {/* Mobile View - Scrollable */}
-        <div className="md:hidden">
+        <div className="md:hidden relative z-10">
           {/* Background уже применен на главном контейнере, здесь не нужен дубликат */}
 
           {/* Scrollable Content */}
@@ -535,7 +551,9 @@ export default function InvitationViewPage() {
             style={{
               fontFamily: invitation.fontFamily,
               fontSize: `${Math.max(14, invitation.fontSize * 0.8)}px`,
-              backgroundColor: 'transparent'
+              backgroundColor: 'transparent',
+              position: 'relative',
+              zIndex: 10
             }}
           >
             {/* Background Music Player */}
