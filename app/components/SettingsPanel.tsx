@@ -422,6 +422,20 @@ export default function SettingsPanel({ invitation, onUpdateInvitation }: Settin
                 />
               </label>
               <label className="flex items-center justify-between cursor-pointer">
+                <span className="text-sm text-gray-700">Starry Sky (Звездное романтическое небо: звезды, туманности, падающие звезды)</span>
+                <input
+                  type="checkbox"
+                  checked={invitation.effects?.starrySky ?? false}
+                  onChange={(e) => updateInvitation({
+                    effects: {
+                      ...invitation.effects,
+                      starrySky: e.target.checked
+                    }
+                  })}
+                  className="w-5 h-5 text-pink-500 rounded focus:ring-pink-500"
+                />
+              </label>
+              <label className="flex items-center justify-between cursor-pointer">
                 <span className="text-sm text-gray-700">Gradient animation (Анимация градиента)</span>
                 <input
                   type="checkbox"

@@ -38,6 +38,7 @@ export interface Invitation {
     blurOnScroll?: boolean
     roseOpeningAnimation?: boolean
     romanticParticles?: boolean
+    starrySky?: boolean
   }
 }
 

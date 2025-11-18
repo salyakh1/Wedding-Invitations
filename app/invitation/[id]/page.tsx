@@ -20,6 +20,7 @@ import AnimatedBlock from '../../components/AnimatedBlock'
 import ParticleEffects from '../../components/ParticleEffects'
 import RomanticParticles from '../../components/RomanticParticles'
 import RoseOpeningAnimation from '../../components/RoseOpeningAnimation'
+import StarrySkyAnimation from '../../components/StarrySkyAnimation'
 
 export default function InvitationViewPage() {
   const params = useParams()
@@ -402,6 +403,9 @@ export default function InvitationViewPage() {
           onComplete={() => setShowInvitation(true)}
         />
       )}
+
+      {/* Starry Sky Animation */}
+      {effects.starrySky && showInvitation && <StarrySkyAnimation enabled={true} />}
 
       {/* Particle Effects */}
       {effects.particles && showInvitation && <ParticleEffects enabled={true} />}
